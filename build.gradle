@@ -1,0 +1,124 @@
+plugins {
+    id 'java'
+    id 'com.mendix.gradle.publish-module-plugin' version '1.15'
+    id 'net.researchgate.release' version '2.8.1'
+}
+
+apply from: 'environment.gradle'
+
+sourceCompatibility = '11'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+    maven {
+        url 'https://nexus.rnd.mendix.com/repository/maven-hosted/'
+    }
+    maven {
+        url 'https://nexus.rnd.mendix.com/repository/repo1-proxy/'
+    }
+}
+
+mxMarketplace {
+    appNumber     = 66876
+    appName       = "OQLModule"
+    moduleName    = "OQL"
+    moduleLicense = "Apache V2"
+    filterWidgets = false
+    filterRequiredLibs = false
+    appDirectory      = "."
+    versionPathPrefix = "__Version " // the path prefix within the module to the version folder
+}
+
+configurations {
+    moduleDirectDependencies
+    implementation.extendsFrom(moduleDirectDependencies)
+}
+
+dependencies {
+    //To be included in exported module userlib
+    moduleDirectDependencies(
+            [group: 'com.opencsv', name: 'opencsv', version: '5.7.1']
+    )
+
+    compileOnly(fileTree(mxRuntimeBundles).include('*.jar'))
+
+    //MxCommons v10.0.0 module dependencies, not included with module release
+    implementation(
+            [group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'],
+            [group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20211018.2'],
+            [group: 'commons-io', name: 'commons-io', version: '2.11.0'],
+            [group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.24'],
+            [group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'],
+            [group: 'org.apache.commons', name: 'commons-text', version: '1.10.0']
+    )
+    
+    testImplementation('com.mendix.util:junit-helper:1.1.0') {
+        exclude group: 'com.mendix', module: 'public-api'
+    }
+
+    testImplementation(
+        [group: 'junit', name: 'junit', version: '4.13.1'],
+        [group: 'org.hamcrest', name: 'hamcrest', version: '2.2']
+    )
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'javasource'
+        }
+        resources {
+            srcDirs = ['resources', 'build/generated/resources']
+        }
+    }
+}
+
+tasks.register('copyComponents', Copy) {
+    from file('deployment/run/component.xml')
+    into 'build/generated/resources/OSGI-INF/'
+}
+
+processResources  {
+    dependsOn copyComponents
+}
+
+test {
+    useJUnit()
+    jvmArgs = ["-Djava.io.tmpdir=$temporaryDir"]
+    environment 'MX_INSTALL_PATH',mxInstallPath
+}
+
+tasks.register('copyDirectDependenciesToUserlib', Copy) {
+    group "Build"
+    description "Copies the direct dependencies to the userlib directory."
+    
+    dependsOn clean
+    
+    from configurations.moduleDirectDependencies
+    into 'userlib'
+    eachFile { fileCopyDetails ->
+        new File(destinationDir, "${fileCopyDetails.name}.${project.name}.RequiredLib").write ''
+    }
+}
+
+
+clean {
+    delete 'userlib', 'deployment'
+}
+
+release {
+    tagTemplate = '$name-$version'
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation"
+}
+
+exportModule {
+    dependsOn copyDirectDependenciesToUserlib
+    dependsOn test
+    copyDirectDependenciesToUserlib.mustRunAfter copyJarsToUserlib
+}
+
+afterReleaseBuild.dependsOn publishModuleToMarketplace
+ 
