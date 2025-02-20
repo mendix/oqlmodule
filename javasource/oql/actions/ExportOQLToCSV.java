@@ -9,7 +9,6 @@
 
 package oql.actions;
 
-import static oql.implementation.opencsv.ICSVWriter.NO_QUOTE_CHARACTER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,6 +16,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Date;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import com.mendix.core.Core;
@@ -32,7 +32,7 @@ import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.webui.CustomJavaAction;
-import oql.implementation.opencsv.CSVWriter;
+import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
 
@@ -82,12 +82,11 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 		} else {
 			os = fos;
 		}
-		
-        CSVWriter writer = new CSVWriter(new OutputStreamWriter(os), 
+
+		MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), 
                 this.separatorChar.charAt(0), 
-                this.quoteChar != null ? this.quoteChar.charAt(0) : NO_QUOTE_CHARACTER,
-                this.escapeChar != null ? this.escapeChar.charAt(0) : NO_QUOTE_CHARACTER, 
-                "\r\n");
+                this.quoteChar != null ? Optional.of(this.quoteChar.charAt(0)) : Optional.empty(),
+                this.escapeChar != null ? Optional.of(this.escapeChar.charAt(0)) : Optional.empty());
 
 		IMendixObject result = Core.instantiate(getContext(), this.returnEntity);
 		
@@ -110,7 +109,7 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 					headers[index] = columnSchema.getName();
 					index++;
 				}
-				writer.writeNext(headers);
+				writer.writeRow(headers);
 			}
 			
 			for (IDataRow row : results.getRows()) {
@@ -132,7 +131,7 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 						}
 					}
 				}
-				writer.writeNext(values);
+				writer.writeRow(values);
 			}
 			
 			if (results.getRowCount() != PAGE_SIZE) {
