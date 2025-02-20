@@ -1,10 +1,26 @@
 package oql.implementation.opencsv;
 
+/*
+ Copyright 2015 Bytecode Pty Ltd.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ 
+ Modified by Mendix, removing ResultSetHelper variable and methods setResultService, writeColumnNames, writeAll(ResultSet, ...) and resultService
+ */
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * The AbstractCSVWriter was created to prevent duplication of code between the CSVWriter and the
@@ -16,7 +32,6 @@ public abstract class AbstractCSVWriter implements ICSVWriter {
 
     protected final Writer writer;
     protected String lineEnd;
-    protected ResultSetHelper resultService;
     protected volatile IOException exception;
 
     /**
@@ -42,35 +57,7 @@ public abstract class AbstractCSVWriter implements ICSVWriter {
             exception = e;
         }
     }
-
-    /**
-     * Writes the column names.
-     *
-     * @param rs               ResultSet containing column names.
-     * @param applyQuotesToAll Whether all header names should be quoted.
-     * @throws SQLException Thrown by {@link ResultSetHelper#getColumnNames(ResultSet)}
-     */
-    protected void writeColumnNames(ResultSet rs, boolean applyQuotesToAll) throws SQLException {
-        writeNext(resultService().getColumnNames(rs), applyQuotesToAll);
-    }
-
-    @Override
-    public int writeAll(ResultSet rs, boolean includeColumnNames, boolean trim, boolean applyQuotesToAll) throws SQLException, IOException {
-        int linesWritten = 0;
-
-        if (includeColumnNames) {
-            writeColumnNames(rs, applyQuotesToAll);
-            linesWritten++;
-        }
-
-        while (rs.next()) {
-            writeNext(resultService().getColumnValues(rs, trim), applyQuotesToAll);
-            linesWritten++;
-        }
-
-        return linesWritten;
-    }
-
+    
     @Override
     public void writeNext(String[] nextLine, boolean applyQuotesToAll) {
         try {
@@ -132,22 +119,5 @@ public abstract class AbstractCSVWriter implements ICSVWriter {
     @Override
     public void resetError() {
         exception = null;
-    }
-
-    @Override
-    public void setResultService(ResultSetHelper resultService) {
-        this.resultService = resultService;
-    }
-
-    /**
-     * Lazy resultSetHelper creation.
-     *
-     * @return Instance of resultSetHelper
-     */
-    protected ResultSetHelper resultService() {
-        if (resultService == null) {
-            resultService = new ResultSetHelperService();
-        }
-        return resultService;
     }
 }

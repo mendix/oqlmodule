@@ -29,17 +29,7 @@ mxMarketplace {
     versionPathPrefix = "__Version " // the path prefix within the module to the version folder
 }
 
-configurations {
-    moduleDirectDependencies
-    implementation.extendsFrom(moduleDirectDependencies)
-}
-
 dependencies {
-    //To be included in exported module userlib
-    moduleDirectDependencies(
-            [group: 'com.opencsv', name: 'opencsv', version: '5.7.1']
-    )
-
     compileOnly(fileTree(mxRuntimeBundles).include('*.jar'))
 
     //MxCommons v10.0.0 module dependencies, not included with module release
@@ -87,21 +77,6 @@ test {
     jvmArgs = ["-Djava.io.tmpdir=$temporaryDir"]
     environment 'MX_INSTALL_PATH',mxInstallPath
 }
-
-tasks.register('copyDirectDependenciesToUserlib', Copy) {
-    group "Build"
-    description "Copies the direct dependencies to the userlib directory."
-    
-    dependsOn clean
-    
-    from configurations.moduleDirectDependencies
-    into 'userlib'
-    eachFile { fileCopyDetails ->
-        new File(destinationDir, "${fileCopyDetails.name}.${project.name}.RequiredLib").write ''
-    }
-}
-
-
 clean {
     delete 'userlib', 'deployment'
 }
@@ -115,9 +90,9 @@ tasks.withType(JavaCompile) {
 }
 
 exportModule {
-    dependsOn copyDirectDependenciesToUserlib
+    dependsOn clean
     dependsOn test
-    copyDirectDependenciesToUserlib.mustRunAfter copyJarsToUserlib
+    clean.mustRunAfter copyJarsToUserlib
 }
 
 afterReleaseBuild.dependsOn publishModuleToMarketplace

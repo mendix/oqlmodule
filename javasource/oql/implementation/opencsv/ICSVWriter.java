@@ -1,5 +1,23 @@
 package oql.implementation.opencsv;
 
+/*
+ Copyright 2015 Bytecode Pty Ltd.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ 
+ Modified by Mendix, removing methods setResultService, writeAll(ResultSet, ...)
+ */
+
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -93,56 +111,6 @@ public interface ICSVWriter extends Closeable, Flushable {
     }
 
     /**
-     * Writes the entire ResultSet to a CSV file.
-     * <p>
-     * The caller is responsible for closing the ResultSet. Values are not trimmed.
-     * Quotes are applied to all values in the output.
-     *
-     * @param rs                 The result set to write
-     * @param includeColumnNames True if you want column names in the output, false otherwise
-     * @return Number of lines written.
-     * @throws IOException   Thrown by ResultSetHelper.getColumnValues()
-     * @throws SQLException Thrown by ResultSetHelper.getColumnValues()
-     */
-    default int writeAll(ResultSet rs, boolean includeColumnNames) throws SQLException, IOException {
-        return writeAll(rs, includeColumnNames, false, true);
-    }
-
-    /**
-     * Writes the entire ResultSet to a CSV file.
-     * <p>
-     * The caller is responsible for closing the ResultSet. Quotes are applied to
-     * all values in the output.
-     *
-     * @param rs                 The Result set to write.
-     * @param includeColumnNames Include the column names in the output.
-     * @param trim               Remove spaces from the data before writing.
-     * @return Number of lines written - including header.
-     * @throws IOException   Thrown by ResultSetHelper.getColumnValues()
-     * @throws SQLException Thrown by ResultSetHelper.getColumnValues()
-     */
-    default int writeAll(ResultSet rs, boolean includeColumnNames, boolean trim) throws SQLException, IOException {
-        return writeAll(rs, includeColumnNames, trim, true);
-    }
-
-    /**
-     * Writes the entire ResultSet to a CSV file.
-     *
-     * The caller is responsible for closing the ResultSet.
-     *
-     * @param rs The Result set to write.
-     * @param includeColumnNames Include the column names in the output.
-     * @param trim Remove spaces from the data before writing.
-     * @param applyQuotesToAll Whether all values should be quoted.
-     *
-     * @throws IOException   Thrown by ResultSetHelper.getColumnValues()
-     * @throws SQLException Thrown by ResultSetHelper.getColumnValues()
-     *
-     * @return Number of lines written - including header.
-     */
-    int writeAll(ResultSet rs, boolean includeColumnNames, boolean trim, boolean applyQuotesToAll) throws SQLException, IOException;
-
-    /**
      * Writes the next line to the file.
      *
      * @param nextLine         A string array with each comma-separated element as a separate
@@ -187,12 +155,6 @@ public interface ICSVWriter extends Closeable, Flushable {
      * using {@link ICSVWriter#checkError()}.
      */
     void resetError();
-
-    /**
-     * Sets the result service.
-     * @param resultService The ResultSetHelper
-     */
-    void setResultService(ResultSetHelper resultService);
 
     /**
      * Flushes the writer without throwing any exceptions.
