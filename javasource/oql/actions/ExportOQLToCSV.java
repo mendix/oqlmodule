@@ -9,6 +9,7 @@
 
 package oql.actions;
 
+import static oql.implementation.opencsv.ICSVWriter.NO_QUOTE_CHARACTER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,7 +32,7 @@ import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.webui.CustomJavaAction;
-import com.opencsv.CSVWriter;
+import oql.implementation.opencsv.CSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
 
@@ -84,8 +85,8 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 		
         CSVWriter writer = new CSVWriter(new OutputStreamWriter(os), 
                 this.separatorChar.charAt(0), 
-                this.quoteChar != null ? this.quoteChar.charAt(0) : CSVWriter.NO_QUOTE_CHARACTER,
-                this.escapeChar != null ? this.escapeChar.charAt(0) : CSVWriter.NO_ESCAPE_CHARACTER, 
+                this.quoteChar != null ? this.quoteChar.charAt(0) : NO_QUOTE_CHARACTER,
+                this.escapeChar != null ? this.escapeChar.charAt(0) : NO_QUOTE_CHARACTER, 
                 "\r\n");
 
 		IMendixObject result = Core.instantiate(getContext(), this.returnEntity);
@@ -179,5 +180,7 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 		request.setParameters(parameterMap);
 		return request;
 	}
+
+	
 	// END EXTRA CODE
 }

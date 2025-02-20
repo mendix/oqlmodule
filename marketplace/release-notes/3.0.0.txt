@@ -1,0 +1,1 @@
+We upgraded the module to Mendix version 9.18.4 and upgraded atlas ui to 3

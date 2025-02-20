@@ -28,7 +28,7 @@
 !/javascriptsource/**/node_modules/
 
 #Gradle
-./gradle/
+.gradle/
 /build/
 /upgraded/
 
