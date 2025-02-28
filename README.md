@@ -58,7 +58,8 @@ In the example above, the resulting columns `Name`, `Number`, `DateOfBirth`, `Ag
 * Mapping of an ID column to an assocation.
 
 # Dependencies
-Mendix 9.18.4 or newer
+Mendix 9.18.4 or newer   
+MxCommons Module 10.0 or newer
 
 # Installation
 Download from [Mendix marketplace](https://marketplace.mendix.com/link/component/66876) and import into your project.
