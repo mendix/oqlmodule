@@ -1,0 +1,13 @@
+exclude:
+  global:
+    - javasource/administration/
+    - javasource/atlas_core/
+    - javasource/atlas_nativemobile_content/
+    - javasource/atlas_web_content/
+    - javasource/communitycommons/
+    - javasource/mxmodelreflection/
+    - javasource/myfirstmodule/
+    - javasource/navigationlayouts/
+    - javasource/oqlexample/
+    - javasource/system/
+    - src/test/
