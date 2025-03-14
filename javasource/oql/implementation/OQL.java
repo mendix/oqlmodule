@@ -1,8 +1,8 @@
 package oql.implementation;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -85,16 +85,23 @@ public class OQL {
 		schema.setAmount(amount != null ? amount : 0);
 		request.setRetrievalSchema(schema);
 		
-		List<IMendixObject> result = new LinkedList<IMendixObject>();
-		logger.debug("Executing query\n:" + statement);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing query\n:" + statement);
+		}
 		IDataTable results = Core.retrieveOQLDataTable(context, request);
-		logger.debug("Mapping " + results.getRowCount() + " results.");
+		if (logger.isDebugEnabled()) {
+			logger.debug("Mapping " + results.getRowCount() + " results.");
+		}
+
+		List<IMendixObject> result = new ArrayList<IMendixObject>(results.getRowCount());
 		IDataTableSchema tableSchema = results.getSchema();
 		for (IDataRow row : results.getRows()) {
 			IMendixObject targetObj = Core.instantiate(context, returnEntity);
 			for (int i = 0; i < tableSchema.getColumnCount(); i++) {
 				IDataColumnSchema columnSchema = tableSchema.getColumnSchema(i);
-				logger.trace("Mapping column "+ columnSchema.getName());
+				if (logger.isTraceEnabled()) {
+					logger.trace("Mapping column " + columnSchema.getName());
+				}
 				Object value = row.getValue(context, i);
 				IMetaObject targetMeta = targetObj.getMetaObject();
 				

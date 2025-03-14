@@ -98,8 +98,9 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 		
 		int offset = 0;
 		while(true) {
-			logger.debug("Executing query offset " + offset);
-			
+			if (logger.isDebugEnabled()) {
+				logger.debug("Executing query offset " + offset);
+			}
 			
 			IContext context = getContext().createSudoClone();
 			IDataTable results = Core.retrieveOQLDataTable(context, buildRequest(statement, offset, PAGE_SIZE));
