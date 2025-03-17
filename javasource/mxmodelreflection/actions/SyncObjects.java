@@ -21,8 +21,8 @@ import com.mendix.webui.CustomJavaAction;
 import com.mendix.webui.FeedbackHelper;
 
 /**
- * Reads all information from the running project and synchronize the full MxModelReflection domain model with the information from the current project
- * 
+ * Reads all information from the running project and synchronize the full MxModelReflection domain model with the information from the current project
+ * 
  * (The return value from this action can be ignored)
  */
 public class SyncObjects extends CustomJavaAction<java.lang.Boolean>

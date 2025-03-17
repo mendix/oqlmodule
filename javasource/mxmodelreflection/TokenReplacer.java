@@ -12,6 +12,8 @@ import mxmodelreflection.proxies.TokenType;
 
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
+import com.mendix.core.objectmanagement.member.MendixObjectReference;
+import com.mendix.core.objectmanagement.member.MendixObjectReferenceSet;
 import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
@@ -19,6 +21,7 @@ import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.systemwideinterfaces.core.IMendixObjectMember;
 import com.mendix.systemwideinterfaces.core.meta.IMetaAssociation;
 import com.mendix.systemwideinterfaces.core.meta.IMetaAssociation.AssociationOwner;
+import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
 
 public class TokenReplacer
 {
@@ -105,15 +108,16 @@ public class TokenReplacer
 					IMendixObject objectTypeStart = Core.retrieveId(context, (IMendixIdentifier) token.getValue(context, Token.MemberNames.Token_MxObjectType_Start.toString()));
 					IMendixObject objectTypeReference = Core.retrieveId(context, (IMendixIdentifier) token.getValue(context, Token.MemberNames.Token_MxObjectType_Referenced.toString()));
 					IMendixObject member = Core.retrieveId(context, (IMendixIdentifier) token.getValue(context, Token.MemberNames.Token_MxObjectMember.toString()));
-
-					if( Core.isSubClassOf( (String) objectTypeStart.getValue(context, MxObjectType.MemberNames.CompleteName.toString()), replacementObject.getType() )  )
+					String parentName = (String) objectTypeStart.getValue(context, MxObjectType.MemberNames.CompleteName.toString());
+					if( Core.isSubClassOf(parentName, replacementObject.getType() )  )
 					{
-						IMetaAssociation association = Core.getMetaAssociation((String) reference.getValue(context, MxObjectReference.MemberNames.CompleteName.toString()));
-						if (association.getOwner() == AssociationOwner.BOTH 
-								|| association.getParent().getName().equals(objectTypeStart.getValue(context, MxObjectType.MemberNames.CompleteName.toString()))
-								|| Core.isSubClassOf(association.getParent().getName(), replacementObject.getType()))
+						String associationName = (String) reference.getValue(context, MxObjectReference.MemberNames.CompleteName.toString());
+						if (replacementObject.getMetaObject().getMetaAssociationParent(associationName) != null)
 						{
-							IMendixIdentifier refObjectId = replacementObject.getValue(context, (String) reference.getValue(context, MxObjectReference.MemberNames.CompleteName.toString()));
+							final var association = replacementObject.getMember(context, associationName);
+							final var refObjectId = association instanceof MendixObjectReference ?
+								((MendixObjectReference) association).getValue(context) :
+								((MendixObjectReferenceSet) association).getValue(context).stream().findFirst().orElse(null);
 							if (refObjectId != null)
 							{
 								IMendixObject refObj = Core.retrieveId(context, refObjectId);
@@ -123,7 +127,7 @@ public class TokenReplacer
 						}
 						else
 						{
-							List<IMendixObject> result = Core.retrieveXPathQuery(context, "//" + objectTypeReference.getValue(context, MxObjectType.MemberNames.CompleteName.toString()) + "[" + reference.getValue(context, MxObjectReference.MemberNames.CompleteName.toString()) + "='" + replacementObject.getId().toLong() + "']");
+							List<IMendixObject> result = Core.retrieveXPathQuery(context, "//" + objectTypeReference.getValue(context, MxObjectType.MemberNames.CompleteName.toString()) + "[" + associationName + "='" + replacementObject.getId().toLong() + "']");
 							if (result.size() > 0)
 							{
 								IMendixObject rsObject = result.get(0);
@@ -133,7 +137,7 @@ public class TokenReplacer
 					}
 					else
 					{
-						throw new CoreException("wrong object type in token: " + tokenValue + ", Expecting type: " + objectTypeStart.getValue(context, MxObjectType.MemberNames.CompleteName.toString()) + " received type: " +  replacementObject.getType());
+						throw new CoreException("wrong object type in token: " + tokenValue + ", Expecting type: " + parentName + " received type: " +  replacementObject.getType());
 					}
 				}
 			}
