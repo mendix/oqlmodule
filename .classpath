@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="userlib/animal-sniffer-annotations-1.17.jar"/>
 	<classpathentry kind="lib" path="userlib/checker-qual-2.5.2.jar"/>
 	<classpathentry kind="lib" path="userlib/checker-qual-3.8.0.jar"/>
-	<classpathentry kind="lib" path="userlib/commons-beanutils-1.9.4.jar"/>
+	<classpathentry kind="lib" path="userlib/commons-beanutils-1.11.0.jar"/>
 	<classpathentry kind="lib" path="userlib/commons-collections4-4.4.jar"/>
 	<classpathentry kind="lib" path="userlib/commons-io-2.11.0.jar"/>
 	<classpathentry kind="lib" path="userlib/commons-lang3-3.12.0.jar"/>
