@@ -12,17 +12,22 @@ package oql.actions;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
-public class AddDateTimeParameter extends CustomJavaAction<java.lang.Boolean>
+public class AddDateTimeParameter extends UserAction<java.lang.Boolean>
 {
-	private java.lang.String name;
-	private java.util.Date value;
+	private final java.lang.String name;
+	private final java.util.Date value;
 
-	public AddDateTimeParameter(IContext context, java.lang.String name, java.util.Date value)
+	public AddDateTimeParameter(
+		IContext context,
+		java.lang.String _name,
+		java.util.Date _value
+	)
 	{
 		super(context);
-		this.name = name;
-		this.value = value;
+		this.name = _name;
+		this.value = _value;
 	}
 
 	@java.lang.Override
