@@ -38,11 +38,14 @@
         }
     }
 
-    .form-control:not([readonly]):focus {
-        border-color: $form-input-border-focus-color;
-        outline: 0;
-        background-color: $form-input-bg-focus;
-        box-shadow: none;
+    .form-control:not([readonly]) {
+        &:focus,
+        &:focus-within {
+            border-color: $form-input-border-focus-color;
+            outline: 0;
+            background-color: $form-input-bg-focus;
+            box-shadow: none;
+        }
     }
 
     .form-control[disabled],
@@ -171,7 +174,6 @@
         .control-label {
             overflow: hidden;
             margin-bottom: 4px;
-            text-align: left;
             text-overflow: ellipsis;
             color: $form-label-color;
             font-size: $form-label-size;

@@ -39,29 +39,40 @@ import com.mendix.webui.CustomJavaAction;
 import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
-public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
+public class ExportOQLToCSV extends UserAction<IMendixObject>
 {
-	private java.lang.String statement;
-	private java.lang.String returnEntity;
-	private java.lang.Boolean removeNewLinesFromValues;
-	private java.lang.Boolean zipResult;
-	private java.lang.Boolean exportHeaders;
-	private java.lang.String separatorChar;
-	private java.lang.String quoteChar;
-	private java.lang.String escapeChar;
+	private final java.lang.String statement;
+	private final java.lang.String returnEntity;
+	private final java.lang.Boolean removeNewLinesFromValues;
+	private final java.lang.Boolean zipResult;
+	private final java.lang.Boolean exportHeaders;
+	private final java.lang.String separatorChar;
+	private final java.lang.String quoteChar;
+	private final java.lang.String escapeChar;
 
-	public ExportOQLToCSV(IContext context, java.lang.String statement, java.lang.String returnEntity, java.lang.Boolean removeNewLinesFromValues, java.lang.Boolean zipResult, java.lang.Boolean exportHeaders, java.lang.String separatorChar, java.lang.String quoteChar, java.lang.String escapeChar)
+	public ExportOQLToCSV(
+		IContext context,
+		java.lang.String _statement,
+		java.lang.String _returnEntity,
+		java.lang.Boolean _removeNewLinesFromValues,
+		java.lang.Boolean _zipResult,
+		java.lang.Boolean _exportHeaders,
+		java.lang.String _separatorChar,
+		java.lang.String _quoteChar,
+		java.lang.String _escapeChar
+	)
 	{
 		super(context);
-		this.statement = statement;
-		this.returnEntity = returnEntity;
-		this.removeNewLinesFromValues = removeNewLinesFromValues;
-		this.zipResult = zipResult;
-		this.exportHeaders = exportHeaders;
-		this.separatorChar = separatorChar;
-		this.quoteChar = quoteChar;
-		this.escapeChar = escapeChar;
+		this.statement = _statement;
+		this.returnEntity = _returnEntity;
+		this.removeNewLinesFromValues = _removeNewLinesFromValues;
+		this.zipResult = _zipResult;
+		this.exportHeaders = _exportHeaders;
+		this.separatorChar = _separatorChar;
+		this.quoteChar = _quoteChar;
+		this.escapeChar = _escapeChar;
 	}
 
 	@java.lang.Override

@@ -17,23 +17,29 @@ import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
 /**
  * This action executes the OQL statement and returns the amount of rows which will be returned by the OQL statement.
  * The main purpose of this action was to avoid overhead of object creation while the interest is to determine if a record within the database exists.
  */
-public class CountRowsOQLStatement extends CustomJavaAction<java.lang.Long>
+public class CountRowsOQLStatement extends UserAction<java.lang.Long>
 {
-	private java.lang.String statement;
-	private java.lang.Long amount;
-	private java.lang.Long offset;
+	private final java.lang.String statement;
+	private final java.lang.Long amount;
+	private final java.lang.Long offset;
 
-	public CountRowsOQLStatement(IContext context, java.lang.String statement, java.lang.Long amount, java.lang.Long offset)
+	public CountRowsOQLStatement(
+		IContext context,
+		java.lang.String _statement,
+		java.lang.Long _amount,
+		java.lang.Long _offset
+	)
 	{
 		super(context);
-		this.statement = statement;
-		this.amount = amount;
-		this.offset = offset;
+		this.statement = _statement;
+		this.amount = _amount;
+		this.offset = _offset;
 	}
 
 	@java.lang.Override
