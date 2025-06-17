@@ -12,17 +12,22 @@ package oql.actions;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
-public class AddDecimalParameter extends CustomJavaAction<java.lang.Boolean>
+public class AddDecimalParameter extends UserAction<java.lang.Boolean>
 {
-	private java.lang.String name;
-	private java.math.BigDecimal value;
+	private final java.lang.String name;
+	private final java.math.BigDecimal value;
 
-	public AddDecimalParameter(IContext context, java.lang.String name, java.math.BigDecimal value)
+	public AddDecimalParameter(
+		IContext context,
+		java.lang.String _name,
+		java.math.BigDecimal _value
+	)
 	{
 		super(context);
-		this.name = name;
-		this.value = value;
+		this.name = _name;
+		this.value = _value;
 	}
 
 	@java.lang.Override
