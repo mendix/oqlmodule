@@ -36,6 +36,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.parser.ParserDelegator;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.text.StringEscapeUtils;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
@@ -222,8 +223,12 @@ public class StringUtils {
 			return null;
 		}
 		try (InputStream f = Core.getFileDocumentContent(context, source.getMendixObject())) {
-			return IOUtils.toString(f, charset);
+			return stringFromInputStream(f, charset);
 		}
+	}
+
+	public static String stringFromInputStream(InputStream inputStream, Charset charset) throws IOException {
+		return IOUtils.toString(BOMInputStream.builder().setInputStream(inputStream).get(), charset);
 	}
 
 	public static void stringToFile(IContext context, String value, FileDocument destination) throws IOException {
@@ -493,7 +498,12 @@ public class StringUtils {
 		PolicyFactory policyFactory = null;
 
 		for (SanitizerPolicy param : policyParams) {
-			policyFactory = (policyFactory == null) ? SANITIZER_POLICIES.get(param.name()) : policyFactory.and(SANITIZER_POLICIES.get(param.name()));
+			PolicyFactory policyFactoryForParam = SANITIZER_POLICIES.get(param.name());
+			policyFactory = (policyFactory == null) ? policyFactoryForParam : policyFactory.and(policyFactoryForParam);
+		}
+
+		if (policyFactory == null) {
+			throw new IllegalArgumentException("Sanitizer policy not found.");
 		}
 
 		return sanitizeHTML(html, policyFactory);

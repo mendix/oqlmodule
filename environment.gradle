@@ -2,9 +2,9 @@ def mxPathDefault = (System.getProperty('os.name').startsWith('Windows'))
         ? "${System.getenv('PROGRAMFILES')}/Mendix"
         : "${System.getenv('HOME')}/.mendix"
 def mxPath = System.getenv('MX_INSTALL_PATH') ?: System.getProperty('MX_INSTALL_PATH') ?: mxPathDefault
-def mxInstallVersion = System.getenv('MODELER_VERSION') ?: System.getenv('MX_INSTALL_VERSION') ?: System.getProperty('MX_INSTALL_VERSION') ?: '9.18.4.62522'
+def mxInstallVersion = System.getenv('MODELER_VERSION') ?: System.getenv('MX_INSTALL_VERSION') ?: System.getProperty('MX_INSTALL_VERSION') ?: '10.21.0.64362'
 
 project.ext.mxInstallPath = "${mxPath}/${mxInstallVersion}"
 project.ext.mxRuntimeBundles = new File("${mxInstallPath}/runtime/bundles")
-project.ext.ossClearanceFile = file("SiemensMendixOQL__3.0.0__READMEOSS_2025-03-14__11-29-46.html")
+project.ext.ossClearanceFile = file("SiemensMendixOQL__4.0.0__READMEOSS.html")
 project.ext.licenseFile = file("LICENSE.txt")

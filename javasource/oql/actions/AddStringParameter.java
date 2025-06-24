@@ -12,17 +12,22 @@ package oql.actions;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
-public class AddStringParameter extends CustomJavaAction<java.lang.Boolean>
+public class AddStringParameter extends UserAction<java.lang.Boolean>
 {
-	private java.lang.String name;
-	private java.lang.String value;
+	private final java.lang.String name;
+	private final java.lang.String value;
 
-	public AddStringParameter(IContext context, java.lang.String name, java.lang.String value)
+	public AddStringParameter(
+		IContext context,
+		java.lang.String _name,
+		java.lang.String _value
+	)
 	{
 		super(context);
-		this.name = name;
-		this.value = value;
+		this.name = _name;
+		this.value = _value;
 	}
 
 	@java.lang.Override

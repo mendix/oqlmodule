@@ -11,15 +11,19 @@ package oqlexample.actions;
 
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
-public class StringTemplateTest extends CustomJavaAction<java.lang.Void>
+public class StringTemplateTest extends UserAction<java.lang.Void>
 {
-	private com.mendix.systemwideinterfaces.javaactions.parameters.IStringTemplate statement;
+	private final com.mendix.systemwideinterfaces.javaactions.parameters.IStringTemplate statement;
 
-	public StringTemplateTest(IContext context, com.mendix.systemwideinterfaces.javaactions.parameters.IStringTemplate statement)
+	public StringTemplateTest(
+		IContext context,
+		com.mendix.systemwideinterfaces.javaactions.parameters.IStringTemplate _statement
+	)
 	{
 		super(context);
-		this.statement = statement;
+		this.statement = _statement;
 	}
 
 	@java.lang.Override

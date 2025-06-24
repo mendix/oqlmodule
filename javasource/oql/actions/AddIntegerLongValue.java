@@ -12,17 +12,22 @@ package oql.actions;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
-public class AddIntegerLongValue extends CustomJavaAction<java.lang.Boolean>
+public class AddIntegerLongValue extends UserAction<java.lang.Boolean>
 {
-	private java.lang.String name;
-	private java.lang.Long value;
+	private final java.lang.String name;
+	private final java.lang.Long value;
 
-	public AddIntegerLongValue(IContext context, java.lang.String name, java.lang.Long value)
+	public AddIntegerLongValue(
+		IContext context,
+		java.lang.String _name,
+		java.lang.Long _value
+	)
 	{
 		super(context);
-		this.name = name;
-		this.value = value;
+		this.name = _name;
+		this.value = _value;
 	}
 
 	@java.lang.Override
