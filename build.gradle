@@ -31,7 +31,7 @@ mxMarketplace {
 }
 
 dependencies {
-    compileOnly(fileTree(mxRuntimeBundles).include('*.jar'))
+    implementation(fileTree(mxRuntimeBundles).include('*.jar'))
 
     //MxCommons v10.1.0 module dependencies, not included with module release
     implementation(
