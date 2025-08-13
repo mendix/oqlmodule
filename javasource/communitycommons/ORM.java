@@ -47,6 +47,12 @@ public class ORM {
 		return anyobject.isChanged();
 	}
 
+	/** Returns true if any member has a value other than its original value. */
+	public static boolean objectHasChangedMemberValue(IContext context, IMendixObject object) {
+		// The original method was replaced with this exception because it does not work with anything [10.0.0, 10.18.6]
+		throw new UnsupportedOperationException("objectHasChangedMemberValue does not work with Mendix versions earlier than 10.18.6");
+	}
+
 	/**
 	 * checks whether a certain member of an object has changed. If the objects itself is still new,
 	 * we consider to be changes as well.
@@ -64,6 +70,12 @@ public class ORM {
 			throw new IllegalArgumentException("Unknown member: " + member);
 		}
 		return item.getMember(context, member).getState() == MemberState.CHANGED || item.getState() != ObjectState.NORMAL;
+	}
+
+	/** Check if the value of the member was changed to something other than its original value. */
+	public static boolean memberHasChangedValue(IContext context, IMendixObject item, String member) {
+		// The original method was replaced with this exception because it does not work with anything [10.0.0, 10.18.6]
+		throw new UnsupportedOperationException("memberHasChangedValue does not work with Mendix versions earlier than 10.18.6");
 	}
 
 	public static void deepClone(IContext c, IMendixObject source, IMendixObject target, String membersToSkip, String membersToKeep, String reverseAssociations, String excludeEntities, String excludeModules) throws CoreException {
@@ -265,6 +277,11 @@ public class ORM {
 
 	public static Boolean cloneObject(IContext c, IMendixObject source,
 		IMendixObject target, Boolean withAssociations) {
+		return cloneObject(c, source, target, withAssociations, false);
+	}
+
+	public static Boolean cloneObject(IContext c, IMendixObject source,
+		IMendixObject target, Boolean withAssociations, Boolean skipIsBoth) {
 		Map<String, ? extends IMendixObjectMember<?>> members = source.getMembers(c);
 
 		for (var entry : members.entrySet()) {
@@ -279,6 +296,10 @@ public class ORM {
 				continue;
             }
 			if (withAssociations || ((!(m instanceof MendixObjectReference) && !(m instanceof MendixObjectReferenceSet) && !(m instanceof MendixAutoNumber)))) {
+				if (skipIsBoth && (
+					(m instanceof MendixObjectReference && ((MendixObjectReference) m).isBoth()) ||
+					(m instanceof MendixObjectReferenceSet && ((MendixObjectReferenceSet) m).isBoth())))
+					continue;
 				target.setValue(c, entry.getKey(), m.getValue(c));
 			}
 		}
