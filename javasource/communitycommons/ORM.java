@@ -49,8 +49,8 @@ public class ORM {
 
 	/** Returns true if any member has a value other than its original value. */
 	public static boolean objectHasChangedMemberValue(IContext context, IMendixObject object) {
-		if (object == null) throw new IllegalArgumentException("The provided object is empty");
-		return object.hasChangedMemberValue(context);
+		// The original method was replaced with this exception because it does not work with anything [10.0.0, 10.18.6]
+		throw new UnsupportedOperationException("objectHasChangedMemberValue does not work with Mendix versions earlier than 10.18.6");
 	}
 
 	/**
@@ -74,9 +74,8 @@ public class ORM {
 
 	/** Check if the value of the member was changed to something other than its original value. */
 	public static boolean memberHasChangedValue(IContext context, IMendixObject item, String member) {
-		if (item == null) throw new IllegalArgumentException("The provided object is empty");
-		if (!item.hasMember(member)) throw new IllegalArgumentException("Unknown member: " + member);
-		return item.getMember(context, member).isValueChanged(context);
+		// The original method was replaced with this exception because it does not work with anything [10.0.0, 10.18.6]
+		throw new UnsupportedOperationException("memberHasChangedValue does not work with Mendix versions earlier than 10.18.6");
 	}
 
 	public static void deepClone(IContext c, IMendixObject source, IMendixObject target, String membersToSkip, String membersToKeep, String reverseAssociations, String excludeEntities, String excludeModules) throws CoreException {
