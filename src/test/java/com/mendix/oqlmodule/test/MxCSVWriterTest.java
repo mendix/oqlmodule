@@ -3,9 +3,8 @@ package com.mendix.oqlmodule.test;
 import com.mendix.oqlmodule.test.utils.StringOutputStream;
 
 import oql.implementation.MxCSVWriter;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,12 +12,15 @@ import java.io.OutputStreamWriter;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MxCSVWriterTest {
 
   OutputStream output;
   MxCSVWriter defaultWriter;
-  @Before
-  public void setup(){
+
+  @BeforeEach
+  public void setup() {
     output = new StringOutputStream();
     
     defaultWriter = new MxCSVWriter(new OutputStreamWriter(output),
@@ -41,7 +43,7 @@ public class MxCSVWriterTest {
   
   @Test
   public void testNoSpecialCharacters() throws IOException {
-    Assert.assertEquals(
+    assertEquals(
         "\"john\",\"doe\"\r\n"
             + "\"mary\",\"moose\"\r\n",
         writeAndGetResult(defaultWriter,
@@ -53,7 +55,7 @@ public class MxCSVWriterTest {
   public void testQuotedSpecialCharacters() throws IOException {
     List<List<String>> toWrite = List.of(List.of(",","\r\n"),
         List.of("\\", "\""));
-    Assert.assertEquals(
+    assertEquals(
         "\",\",\"\r\n\"\r\n"
             + "\"\\\",\"\"\"\"\r\n",
         writeAndGetResult(defaultWriter, toWrite)
@@ -69,7 +71,7 @@ public class MxCSVWriterTest {
     
     List<List<String>> toWrite = List.of(List.of(",","\r\n"),
         List.of("\\", "\""));
-    Assert.assertEquals(
+    assertEquals(
         "\\,,\r\\\n\r\n"
             + "\\\\,\"\r\n",
         writeAndGetResult(writerWithoutQuote, toWrite)

@@ -48,9 +48,10 @@ dependencies {
     }
 
     testImplementation(
-        [group: 'junit', name: 'junit', version: '4.13.1'],
-        [group: 'org.hamcrest', name: 'hamcrest', version: '2.2']
+        [group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'],
+        [group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2']
     )
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.8.2')
 }
 
 sourceSets {
@@ -74,10 +75,11 @@ processResources  {
 }
 
 test {
-    useJUnit()
+    useJUnitPlatform()
     jvmArgs = ["-Djava.io.tmpdir=$temporaryDir"]
     environment 'MX_INSTALL_PATH',mxInstallPath
 }
+
 clean {
     delete 'userlib', 'deployment'
 }
