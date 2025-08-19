@@ -10,4 +10,5 @@ cd upgraded
 
 echo "Converting the project ..."
 mx convert --in-place "./"
+./gradlew copyJarsToUserlib
 mxbuild --target=deploy "OQLModule.mpr"
