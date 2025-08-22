@@ -24,7 +24,7 @@ mxMarketplace {
     moduleName    = "OQL"
     moduleLicense = "Apache V2"
     filterWidgets = false
-    filterRequiredLibs = false
+    filterRequiredLibs = true
     appDirectory      = "."
     includeFiles  = List.of(ossClearanceFile, licenseFile)
     versionPathPrefix = "__Version " // the path prefix within the module to the version folder
@@ -81,7 +81,7 @@ test {
 }
 
 clean {
-    delete 'userlib', 'deployment'
+    delete 'userlib', 'deployment', 'vendorlib'
 }
 
 release {
@@ -92,10 +92,19 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation"
 }
 
-exportModule {
+tasks.register('cleanTest') {
     dependsOn clean
+    dependsOn copyJarsToUserlib
+    dependsOn mxBuild
     dependsOn test
-    clean.mustRunAfter copyJarsToUserlib
+
+    copyJarsToUserlib.mustRunAfter clean
+    mxBuild.mustRunAfter copyJarsToUserlib
+    test.mustRunAfter mxBuild
+}
+
+exportModule {
+    dependsOn cleanTest
 }
 
 afterReleaseBuild.dependsOn publishModuleToMarketplace
