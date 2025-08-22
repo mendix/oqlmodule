@@ -33,13 +33,13 @@ mxMarketplace {
 dependencies {
     implementation(fileTree(mxRuntimeBundles).include('*.jar'))
 
-    //MxCommons v10.1.0 module dependencies, not included with module release
+    //MxCommons v10.4.0 module dependencies, not included with module release
     implementation(
-            [group: 'com.google.guava', name: 'guava', version: '32.0.1-jre'],
+            [group: 'com.google.guava', name: 'guava', version: '33.4.7-jre'],
             [group: 'com.googlecode.owasp-java-html-sanitizer', name: 'owasp-java-html-sanitizer', version: '20211018.2'],
             [group: 'commons-io', name: 'commons-io', version: '2.17.0'],
             [group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.30'],
-            [group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'],
+            [group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'],
             [group: 'org.apache.commons', name: 'commons-text', version: '1.10.0']
     )
     
@@ -81,7 +81,7 @@ test {
 }
 
 clean {
-    delete 'userlib', 'deployment', 'vendorlib'
+    delete 'deployment'
 }
 
 release {
@@ -94,12 +94,10 @@ tasks.withType(JavaCompile) {
 
 tasks.register('cleanTest') {
     dependsOn clean
-    dependsOn copyJarsToUserlib
     dependsOn mxBuild
     dependsOn test
 
-    copyJarsToUserlib.mustRunAfter clean
-    mxBuild.mustRunAfter copyJarsToUserlib
+    mxBuild.mustRunAfter clean
     test.mustRunAfter mxBuild
 }
 

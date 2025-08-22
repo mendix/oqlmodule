@@ -67,7 +67,7 @@ public class ExecuteOQLStatementWithParametersTest extends OQLStatementTestSkele
   @Test
   public void executeOQLStatementWithObjectParameter() throws Exception {
     final String selectSomeWithArgument = selectSome + " WHERE id = $Param";
-    new AddObjectParameter(this.context, "Param", this.testPersons.getFirst().getMendixObject()).executeAction();
+    new AddObjectParameter(this.context, "Param", this.testPersons.get(0).getMendixObject()).executeAction();
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectSomeWithArgument, ExamplePersonResult.entityName, null, null, false)
             .executeAction();
 
