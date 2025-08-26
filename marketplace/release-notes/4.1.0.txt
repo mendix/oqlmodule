@@ -1,0 +1,1 @@
+We fixed the ExportOQLToCSV Java action to replace DOS and Unix style new lines by a single space each.
