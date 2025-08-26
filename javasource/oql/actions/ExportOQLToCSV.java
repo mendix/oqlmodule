@@ -190,11 +190,7 @@ public class ExportOQLToCSV extends UserAction<IMendixObject>
 							}
 						}
 					})
-					.map(value ->
-							this.removeNewLinesFromValues
-									? value.replaceAll("\r", " ").replaceAll("\n", "")
-									: value
-					)
+					.map(value -> this.removeNewLinesFromValues ? value.replaceAll("(\r\n|\n|\r)", " ") : value)
 					.collect(Collectors.toCollection(ArrayList::new));
 			writer.writeRow(values);
 		}
