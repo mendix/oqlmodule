@@ -1,1 +1,2 @@
 We fixed the ExportOQLToCSV Java action to replace DOS and Unix style new lines by a single space each.
+We fixed the ExecuteOQLStatement to ignore non-aliased IDs of the result object. (Ticket 234219)
