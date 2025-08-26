@@ -39,16 +39,17 @@ abstract public class OQLStatementTestSkeleton {
 
   public OQLStatementTestSkeleton() {
     ProjectRunner.run();
-    this.context = Core.createSystemContext();
     this.logger = Core.getLogger(this.getClass().getName());
   }
 
   @BeforeAll
   public void prepare() {
+    IContext prepareContext = Core.createSystemContext();
+
     this.testPersons = new ArrayList<>();
     ExamplePerson marriedTo = null;
     for (int i = 0; i < TEST_OBJECTS; i++) {
-      ExamplePerson newPerson = new ExamplePerson(this.context);
+      ExamplePerson newPerson = new ExamplePerson(prepareContext);
       newPerson.setActive(i % 2 == 0);
       newPerson.setAge(i);
       newPerson.setDateOfBirth(new GregorianCalendar(100, i % 12, i % 30 + 1).getTime());
@@ -60,17 +61,25 @@ abstract public class OQLStatementTestSkeleton {
       this.testPersons.add(newPerson);
       marriedTo = marriedTo == null ? newPerson : null; // Alternate between null and current
     }
-    Core.commit(this.context, this.testPersons.stream().map(ExamplePerson::getMendixObject).collect(Collectors.toList()));
+    Core.commit(prepareContext, this.testPersons.stream().map(ExamplePerson::getMendixObject).collect(Collectors.toList()));
+  }
+
+  @AfterAll
+  public void cleanUp() {
+    IContext cleanUpContext = Core.createSystemContext();
+    Core.delete(cleanUpContext, Core.createXPathQuery("//OQL.ExamplePerson").execute(cleanUpContext));
+  }
+
+  @BeforeEach
+  public void setUpContext() {
+    this.context = Core.createSystemContext();
+    this.context.startTransaction();
   }
 
   @AfterEach
   public void cleanUpParameters() {
     OQL.resetParameters();
-  }
-
-  @AfterAll
-  public void cleanUp() {
-    Core.delete(this.context, Core.createXPathQuery("//OQL.ExamplePerson").execute(this.context));
+    this.context.rollbackTransaction();
   }
 
   protected void assertExamplePersonEquals(List<ExamplePerson> expected, List<IMendixObject> results, ExamplePersonResult.MemberNames[] membersToCheck) throws CoreException {
