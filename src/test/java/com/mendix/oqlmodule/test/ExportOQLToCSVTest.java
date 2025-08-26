@@ -55,8 +55,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
   @Test
   public void exportOQLToCSV() throws Exception {
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
+        .executeAction();
 
     assertEquals(this.expectedCSV, fileContents(returnObject));
   }
@@ -65,13 +65,13 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
   public void exportOQLToCSVZipResults() throws Exception {
     // Load data as zip
     IMendixObject returnObjectZipped =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, true, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, true, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
+        .executeAction();
 
     // Unzip the results
     String contentsZipped;
     try (InputStream stream = Core.getFileDocumentContent(this.context, returnObjectZipped);
-    ZipInputStream unzipped = new ZipInputStream(stream)) {;
+         ZipInputStream unzipped = new ZipInputStream(stream)) {
       unzipped.getNextEntry();
       contentsZipped = new String(unzipped.readAllBytes());
     } catch (IOException e) {
@@ -80,8 +80,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
 
     // Load data without zipping
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
+        .executeAction();
 
     String contents = fileContents(returnObject);
 
@@ -92,8 +92,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
   @Test
   public void exportOQLToCSVRemoveHeader() throws Exception {
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, false, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, false, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
+        .executeAction();
 
     assertEquals(this.expectedCSV.substring(this.expectedCSV.indexOf("\r\n") + 2), fileContents(returnObject));
   }
@@ -101,8 +101,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
   @Test
   public void exportOQLToCSVDifferentSeparator() throws Exception {
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, "@", DEFAULT_QUOTE, null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, "@", DEFAULT_QUOTE, null)
+        .executeAction();
 
     assertEquals(this.expectedCSV.replace(",", "@"), fileContents(returnObject));
   }
@@ -110,8 +110,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
   @Test
   public void exportOQLToCSVDifferentQuote() throws Exception {
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, "@", null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, "@", null)
+        .executeAction();
 
     assertEquals(this.expectedCSV.replace("'", "@"), fileContents(returnObject));
   }
@@ -119,8 +119,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
   @Test
   public void exportOQLToCSVDifferentEscape() throws Exception {
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, null, "\\")
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, false, false, true, DEFAULT_SEPARATOR, null, "\\")
+        .executeAction();
 
     assertEquals(this.expectedCSV.replace("\r\n\\", "\r\\\n\\\\").replace("'", ""), fileContents(returnObject));
   }
@@ -163,8 +163,8 @@ public class ExportOQLToCSVTest extends OQLStatementTestSkeleton {
 
     // Then test
     IMendixObject returnObject =
-            new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, true, false, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
-                    .executeAction();
+      new ExportOQLToCSV(this.context, selectSome, CSVDownload.entityName, true, false, true, DEFAULT_SEPARATOR, DEFAULT_QUOTE, null)
+        .executeAction();
 
     assertEquals(this.expectedCSV.replace("\r\n\\", " ".repeat(spaces) + "\\"), fileContents(returnObject));
   }

@@ -18,7 +18,7 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
   @Test
   public void executeOQLStatementWithAllAttributes() throws Exception {
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectAll, ExamplePersonResult.entityName, null, null, false)
-            .executeAction();
+      .executeAction();
 
     assertExamplePersonEquals(this.testPersons, oqlResult, MemberNames.values());
   }
@@ -26,7 +26,7 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
   @Test
   public void executeOQLStatementWithOffsetAndAmount() throws Exception {
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectAll, ExamplePersonResult.entityName, 2L, 2L, false)
-            .executeAction();
+      .executeAction();
 
     assertExamplePersonEquals(this.testPersons.subList(2, 4), oqlResult, MemberNames.values());
   }
@@ -34,7 +34,7 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
   @Test
   public void executeOQLStatementWithSomeAttributes() throws Exception {
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectSome, ExamplePersonResult.entityName, null, null, false)
-            .executeAction();
+      .executeAction();
 
     assertExamplePersonEquals(this.testPersons, oqlResult, someMembers);
   }
@@ -49,21 +49,21 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
   @Test
   public void executeOQLStatementWithInvalidReturnEntityName() {
     assertThrows(MendixRuntimeException.class, () ->
-            new ExecuteOQLStatement(this.context, selectAll, "AnyNPEWillDo", null, null, false).executeAction()
+      new ExecuteOQLStatement(this.context, selectAll, "AnyNPEWillDo", null, null, false).executeAction()
     );
   }
 
   @Test
   public void executeOQLStatementWithIncompatibleReturnEntityName() {
     assertThrows(NullPointerException.class, () ->
-            new ExecuteOQLStatement(this.context, selectAll, Account.entityName, null, null, false).executeAction()
+      new ExecuteOQLStatement(this.context, selectAll, Account.entityName, null, null, false).executeAction()
     );
   }
 
   @Test
   public void executeOQLStatementFromDataset() throws Exception {
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, "OQL.DataSet", ExamplePersonResult.entityName, null, null, false)
-            .executeAction();
+      .executeAction();
 
     MemberNames[] members = Arrays.stream(MemberNames.values()).filter(member -> !MemberNames.Result_MarriedTo.equals(member)).toArray(MemberNames[]::new);
     assertExamplePersonEquals(this.testPersons, oqlResult, members);
@@ -71,6 +71,9 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
 
   @Test
   public void executeOQLStatementWithSelectStar() throws Exception {
-    assertThrows(NullPointerException.class, () -> new ExecuteOQLStatement(this.context, selectStar, ExamplePersonResult.entityName, null, null, false).executeAction());
+    List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectStar, ExamplePersonResult.entityName, null, null, false)
+      .executeAction();
+
+    assertExamplePersonEquals(this.testPersons, oqlResult, MemberNames.values());
   }
 }

@@ -28,7 +28,7 @@ abstract public class OQLStatementTestSkeleton {
 
   protected static final String selectStar = "SELECT * FROM OQL.ExamplePerson";
   protected static final String selectAll =
-          "SELECT id ExamplePersonResult_ExamplePerson, Number, Name, DateOfBirth, Age, LongAge, Active, HeightInDecimal, Gender, OQL.MarriedTo Result_MarriedTo FROM OQL.ExamplePerson";
+    "SELECT id ExamplePersonResult_ExamplePerson, Number, Name, DateOfBirth, Age, LongAge, Active, HeightInDecimal, Gender, OQL.MarriedTo Result_MarriedTo FROM OQL.ExamplePerson";
   protected static final String selectSome = "SELECT id ExamplePersonResult_ExamplePerson, Name, Age FROM OQL.ExamplePerson";
   protected static final MemberNames[] someMembers = new MemberNames[]{MemberNames.ExamplePersonResult_ExamplePerson, MemberNames.Name, MemberNames.Age};
   protected static final int TEST_OBJECTS = 5;
