@@ -21,7 +21,6 @@ import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive.PrimitiveType;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 public class OQL {
 	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<>();
@@ -96,6 +95,14 @@ public class OQL {
 			IMendixObject targetObj = Core.instantiate(context, returnEntity);
 			for (int i = 0; i < tableSchema.getColumnCount(); i++) {
 				IDataColumnSchema columnSchema = tableSchema.getColumnSchema(i);
+
+				if (columnSchema.getName().matches(".+\\.ID$")) {
+					if (logger.isTraceEnabled()) {
+						logger.trace("Ignoring column " + columnSchema.getName() + " as an identifier");
+					}
+					continue;
+				}
+
 				if (logger.isTraceEnabled()) {
 					logger.trace("Mapping column " + columnSchema.getName());
 				}
@@ -147,23 +154,15 @@ public class OQL {
 	}
 
 	private static IMetaAssociation getAssociation(IMendixObject targetObj, IDataColumnSchema columnSchema) {
-		String columnSchemaName = columnSchema.getName();
-		String columnSchemaPattern = "[^.]+\\." + columnSchemaName;
+		String columnSchemaPattern = "[^.]+\\." + columnSchema.getName();
 
-		Set<IMetaAssociation> candidates = targetObj
+		return targetObj
 			.getMetaObject()
 			.getDeclaredMetaAssociationsParent()
 			.stream()
 			.filter(association -> association.getName().matches(columnSchemaPattern))
-			.collect(Collectors.toSet());
-
-		if (candidates.size() > 1) {
-			String errorMessage = "Column name " + columnSchemaName + " is ambiguous and cannot be mapped to any association. Candidates are "
-				+ candidates.stream().map(IMetaAssociation::getName).collect(Collectors.joining(", "));
-			throw new RuntimeException(errorMessage);
-		}
-
-		return candidates.stream().findFirst().orElse(null);
+			.findFirst()
+			.orElse(null);
 	}
 
 }

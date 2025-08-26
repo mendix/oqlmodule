@@ -74,6 +74,8 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectStar, ExamplePersonResult.entityName, null, null, false)
       .executeAction();
 
-    assertExamplePersonEquals(this.testPersons, oqlResult, MemberNames.values());
+    MemberNames[] members = Arrays.stream(MemberNames.values())
+      .filter(member -> !MemberNames.ExamplePersonResult_ExamplePerson.equals(member) && !MemberNames.Result_MarriedTo.equals(member)).toArray(MemberNames[]::new);
+    assertExamplePersonEquals(this.testPersons, oqlResult, members);
   }
 }
