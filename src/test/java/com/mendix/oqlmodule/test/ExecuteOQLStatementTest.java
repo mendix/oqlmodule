@@ -55,7 +55,7 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
 
   @Test
   public void executeOQLStatementWithIncompatibleReturnEntityName() {
-    assertThrows(NullPointerException.class, () ->
+    assertThrows(RuntimeException.class, () ->
       new ExecuteOQLStatement(this.context, selectAll, Account.entityName, null, null, false).executeAction()
     );
   }

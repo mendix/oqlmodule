@@ -1,12 +1,5 @@
 package oql.implementation;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
 import com.mendix.logging.ILogNode;
@@ -25,26 +18,31 @@ import com.mendix.systemwideinterfaces.core.meta.IMetaObject;
 import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive;
 import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive.PrimitiveType;
 
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 public class OQL {
-	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<Map<String, Object>>();
-	
-	private static ILogNode logger = Core.getLogger(OQL.class.getSimpleName());
-	
+	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<>();
+
+	private static final ILogNode logger = Core.getLogger(OQL.class.getSimpleName());
+
 	public static Map<String, Object> getNextParameters() {
 		if (nextParameters.get() == null) {
-			nextParameters.set(new HashMap<String, Object>());
+			nextParameters.set(new HashMap<>());
 		}
 		return nextParameters.get();
 	}
-	
+
 	public static void resetParameters() {
-		nextParameters.set(new HashMap<String, Object>());;
+		nextParameters.set(new HashMap<>());
 	}
-	
+
 	public static void addParameter(String name, Object value) {
 		getNextParameters().put(name, value);
 	}
-	
+
 	public static Long countRowsOQL(IContext context, String statement, Long amount, Map<String, Object> parameters)
 		throws CoreException {
 		IOQLTextGetRequest request = Core.createOQLTextGetRequest();
@@ -54,7 +52,7 @@ public class OQL {
 			parameterMap.put(entry.getKey(), entry.getValue());
 		}
 		request.setParameters(parameterMap);
-		
+
 		IRetrievalSchema schema = Core.createRetrievalSchema();
 		schema.setAmount(amount);
 		request.setRetrievalSchema(schema);
@@ -63,28 +61,27 @@ public class OQL {
 		IDataTable results = Core.retrieveOQLDataTable(context, request);
 		return (long) results.getRowCount();
 	}
-	
-	public static List<IMendixObject> executeOQL(IContext context, String statement, String returnEntity, 
-			Long amount, Long offset, Map<String, Object> parameters) throws CoreException {
+
+	public static List<IMendixObject> executeOQL(IContext context, String statement, String returnEntity, Long amount, Long offset, Map<String, Object> parameters) throws CoreException {
 		IOQLTextGetRequest request;
 		try {
-			request = Core.createOQLTextGetRequestFromDataSet(statement); 
+			request = Core.createOQLTextGetRequestFromDataSet(statement);
 		} catch (IllegalArgumentException e) {
 			request = Core.createOQLTextGetRequest();
 			request.setQuery(statement);
 		}
-		
+
 		IParameterMap parameterMap = request.createParameterMap();
 		for (Entry<String, Object> entry : OQL.getNextParameters().entrySet()) {
 			parameterMap.put(entry.getKey(), entry.getValue());
 		}
 		request.setParameters(parameterMap);
-		
+
 		IRetrievalSchema schema = Core.createRetrievalSchema();
 		schema.setOffset(offset != null ? offset : 0);
 		schema.setAmount(amount != null ? amount : 0);
 		request.setRetrievalSchema(schema);
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing query\n:" + statement);
 		}
@@ -93,7 +90,7 @@ public class OQL {
 			logger.debug("Mapping " + results.getRowCount() + " results.");
 		}
 
-		List<IMendixObject> result = new ArrayList<IMendixObject>(results.getRowCount());
+		List<IMendixObject> result = new ArrayList<>(results.getRowCount());
 		IDataTableSchema tableSchema = results.getSchema();
 		for (IDataRow row : results.getRows()) {
 			IMendixObject targetObj = Core.instantiate(context, returnEntity);
@@ -104,36 +101,33 @@ public class OQL {
 				}
 				Object value = row.getValue(context, i);
 				IMetaObject targetMeta = targetObj.getMetaObject();
-				
+
 				if (value == null) {
 					IMetaPrimitive primitive = targetMeta.getMetaPrimitive(columnSchema.getName());
 					if (primitive != null) {
 						targetObj.setValue(context, columnSchema.getName(), null);
 					} else {
 						if (getAssociation(targetObj, columnSchema) == null) {
-							throw new NullPointerException("Null value found " + columnSchema.getName() + 
-									" was not found as association or attribute.");
+							throw new RuntimeException("Unable to map null value for column " + columnSchema.getName() + " to any association or attribute.");
 						}
-					} 
-					
+					}
 				} else {
-					
 					if (value instanceof IMendixIdentifier) {
-						logger.trace("Treating as association");				
+						logger.trace("Treating column " + columnSchema.getName() + " as an association");
 						IMetaAssociation association = getAssociation(targetObj, columnSchema);
 						if (association != null) {
 							targetObj.setValue(context, association.getName(), value);
 						} else {
-							throw new NullPointerException("Could not find result association " + columnSchema.getName() + " in target object.");
+							throw new RuntimeException("Could not find result association " + columnSchema.getName() + " in target object.");
 						}
 					} else {
 						logger.trace("Treating as value");
 						IMetaPrimitive primitive = targetMeta.getMetaPrimitive(columnSchema.getName());
-						
+
 						if (primitive == null) {
-							throw new NullPointerException("Could not find result attribute " + columnSchema.getName() + " in target object.");
+							throw new RuntimeException("Could not find result attribute " + columnSchema.getName() + " in target object.");
 						}
-						
+
 						if (value instanceof Integer && primitive.getType() == PrimitiveType.Long) {
 							value = (Long) ((Integer) value).longValue();
 						} else if (value instanceof Long && primitive.getType() == PrimitiveType.Integer) {
@@ -144,28 +138,32 @@ public class OQL {
 						targetObj.setValue(context, columnSchema.getName(), value);
 					}
 				}
-				
+
 			}
 			result.add(targetObj);
 		}
-		
+
 		return result;
 	}
 
 	private static IMetaAssociation getAssociation(IMendixObject targetObj, IDataColumnSchema columnSchema) {
-		/* Escaping an alias as described at https://docs.mendix.com/refguide7/oql-select-clause
-		 * leads to an error when using dots e.g. (OQL.ExamplePerson_ExamplePersonResult).
-		 * Therefore this action accepts the ExamplePerson_ExamplePersonResult part and searches for the
-		 * association that has this in it.
-		 */
-		for (IMetaAssociation association : targetObj.getMetaObject().getDeclaredMetaAssociationsParent()) {
-			String name = association.getName();
-			name = name.substring(name.indexOf('.') + 1);
-			if (name.equals(columnSchema.getName())) {
-				return association;
-			}
+		String columnSchemaName = columnSchema.getName();
+		String columnSchemaPattern = "[^.]+\\." + columnSchemaName;
+
+		Set<IMetaAssociation> candidates = targetObj
+			.getMetaObject()
+			.getDeclaredMetaAssociationsParent()
+			.stream()
+			.filter(association -> association.getName().matches(columnSchemaPattern))
+			.collect(Collectors.toSet());
+
+		if (candidates.size() > 1) {
+			String errorMessage = "Column name " + columnSchemaName + " is ambiguous and cannot be mapped to any association. Candidates are "
+				+ candidates.stream().map(IMetaAssociation::getName).collect(Collectors.joining(", "));
+			throw new RuntimeException(errorMessage);
 		}
-		return null;
+
+		return candidates.stream().findFirst().orElse(null);
 	}
-	
+
 }
