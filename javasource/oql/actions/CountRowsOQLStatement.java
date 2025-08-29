@@ -9,19 +9,26 @@
 
 package oql.actions;
 
-import java.util.List;
-import java.util.Map;
-import com.mendix.core.Core;
-import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.systemwideinterfaces.core.IMendixObject;
-import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
 import com.mendix.systemwideinterfaces.core.UserAction;
 
 /**
- * This action executes the OQL statement and returns the amount of rows which will be returned by the OQL statement.
- * The main purpose of this action was to avoid overhead of object creation while the interest is to determine if a record within the database exists.
+ * This action executes an OQL query and returns the count of rows that would be returned.
+ * 
+ * It is useful to run a query without the overhead of generating Mendix objects for the result in cases where those are not needed.
+ * 
+ * Only SELECT queries are supported.
+ * Queries are executed in a sudo clone of the existing context, so no access rules are applied.
+ * Named parameter values can be defined by first calling the appropriate add parameter functions. They will all be cleared after the query is executed.
+ * 
+ * For details of supported OQL syntax and feature, see https://docs.mendix.com/refguide/oql/
+ * 
+ * This action takes the following parameters:
+ * - statement: OQL Query to be executed.
+ * - amount: Limits the number of results to at most this amount. If there are more results in the query, this amount is returned.
+ * - offset: This parameter is ignored and might be removed in a future version.
+ * 
  */
 public class CountRowsOQLStatement extends UserAction<java.lang.Long>
 {
@@ -47,12 +54,8 @@ public class CountRowsOQLStatement extends UserAction<java.lang.Long>
 	{
 		// BEGIN USER CODE
 		IContext context = getContext().createSudoClone();
-		ILogNode logger = Core.getLogger(this.getClass().getSimpleName());
-		
-		logger.debug("Mapping parameters.");
-		Map<String, Object> parameters = OQL.getNextParameters();
-		Long result = 
-				OQL.countRowsOQL(context, statement, amount, parameters);	
+
+		Long result = OQL.countRowsOQL(context, statement, amount);
 		
 		OQL.resetParameters();
 		return result;
