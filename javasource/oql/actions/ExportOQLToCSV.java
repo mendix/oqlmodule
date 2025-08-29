@@ -35,12 +35,22 @@ import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetR
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
-import com.mendix.webui.CustomJavaAction;
 import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
 import com.mendix.systemwideinterfaces.core.UserAction;
 
+/**
+ * Java action that executes an OQL query and saves the result in a CSV file stored in an object of the specified FileDocument entity, which is then returned.
+ * 
+ * Features:
+ * - Execute an OQL query directly or load a query from a dataset
+ * - Supports OQL named query parameters
+ * - Option to compress the result in a zip file
+ * - Option to remove new lines from string values
+ * - Option to omit headers from the result
+ * - Options to customize column separator, quote character, and character escape
+ */
 public class ExportOQLToCSV extends UserAction<IMendixObject>
 {
 	private final java.lang.String statement;

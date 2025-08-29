@@ -42,7 +42,7 @@ public class OQL {
 		getNextParameters().put(name, value);
 	}
 
-	public static Long countRowsOQL(IContext context, String statement, Long amount, Map<String, Object> parameters)
+	public static Long countRowsOQL(IContext context, String statement, Long amount)
 		throws CoreException {
 		IOQLTextGetRequest request = Core.createOQLTextGetRequest();
 		request.setQuery(statement);
@@ -61,7 +61,7 @@ public class OQL {
 		return (long) results.getRowCount();
 	}
 
-	public static List<IMendixObject> executeOQL(IContext context, String statement, String returnEntity, Long amount, Long offset, Map<String, Object> parameters) throws CoreException {
+	public static List<IMendixObject> executeOQL(IContext context, String statement, String returnEntity, Long amount, Long offset) throws CoreException {
 		IOQLTextGetRequest request;
 		try {
 			request = Core.createOQLTextGetRequestFromDataSet(statement);
