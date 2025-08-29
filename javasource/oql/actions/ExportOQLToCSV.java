@@ -35,12 +35,16 @@ import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetR
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
-import com.mendix.webui.CustomJavaAction;
 import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
 import com.mendix.systemwideinterfaces.core.UserAction;
 
+/**
+ * Java action that executes an OQL query and saves the result in a CSV file stored in an object of the specified FileDocument entity, which is then returned
+ * 
+ * For further documentation please refer to https://docs.mendix.com/appstore/modules/oql-module#exportoqltocsv
+ */
 public class ExportOQLToCSV extends UserAction<IMendixObject>
 {
 	private final java.lang.String statement;
