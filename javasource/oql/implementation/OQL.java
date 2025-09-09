@@ -96,9 +96,10 @@ public class OQL {
 			for (int i = 0; i < tableSchema.getColumnCount(); i++) {
 				IDataColumnSchema columnSchema = tableSchema.getColumnSchema(i);
 
-				if (columnSchema.getName().matches(".+\\.ID$")) {
+				String columnName = columnSchema.getName();
+				if (columnName.matches("^(.+\\.ID|submetaobjectname)$")) {
 					if (logger.isTraceEnabled()) {
-						logger.trace("Ignoring column " + columnSchema.getName() + " as an identifier");
+						logger.trace("Ignoring column " + columnName + " because it is a reserved keyword");
 					}
 					continue;
 				}
@@ -154,7 +155,7 @@ public class OQL {
 	}
 
 	private static IMetaAssociation getAssociation(IMendixObject targetObj, IDataColumnSchema columnSchema) {
-		String columnSchemaPattern = "[^.]+\\." + columnSchema.getName();
+		String columnSchemaPattern = columnSchema.getName().contains(".") ? columnSchema.getName() : "[^.]+\\." + columnSchema.getName();
 
 		return targetObj
 			.getMetaObject()

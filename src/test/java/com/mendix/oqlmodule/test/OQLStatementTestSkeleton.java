@@ -3,9 +3,7 @@ package com.mendix.oqlmodule.test;
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
 import com.mendix.logging.ILogNode;
-import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
-import com.mendix.systemwideinterfaces.core.IMendixObject;
+import com.mendix.systemwideinterfaces.core.*;
 import com.mendix.test.run.ProjectRunner;
 import oql.implementation.OQL;
 import oql.proxies.ExamplePerson;
@@ -13,6 +11,7 @@ import oql.proxies.ExamplePersonResult;
 import oql.proxies.ExamplePersonResult.MemberNames;
 import oql.proxies.Gender;
 import org.junit.jupiter.api.*;
+import system.proxies.User;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ abstract public class OQLStatementTestSkeleton {
   protected List<ExamplePerson> testPersons;
   protected IContext context;
   protected ILogNode logger;
+  protected IUser user;
 
   public OQLStatementTestSkeleton() {
     ProjectRunner.run();
@@ -43,8 +43,18 @@ abstract public class OQLStatementTestSkeleton {
   }
 
   @BeforeAll
-  public void prepare() {
+  public void prepare() throws CoreException {
     IContext prepareContext = Core.createSystemContext();
+
+    // Get the user, if present, or create one, if not:
+    this.user = Core.getUser(prepareContext, "TestUser");
+    if (this.user == null) {
+      User user = new User(prepareContext);
+      user.setName("TestUser");
+      user.setPassword("Mendix123");
+      user.commit();
+      this.user = Core.getUser(prepareContext, "TestUser");
+    }
 
     this.testPersons = new ArrayList<>();
     ExamplePerson marriedTo = null;
@@ -71,8 +81,9 @@ abstract public class OQLStatementTestSkeleton {
   }
 
   @BeforeEach
-  public void setUpContext() {
-    this.context = Core.createSystemContext();
+  public void setUpContext() throws CoreException {
+    ISession session = Core.initializeSession(this.user, null);
+    this.context = session.createContext().createSudoClone();
     this.context.startTransaction();
   }
 
@@ -80,6 +91,7 @@ abstract public class OQLStatementTestSkeleton {
   public void cleanUpParameters() {
     OQL.resetParameters();
     this.context.rollbackTransaction();
+    Core.logout(this.context.getSession());
   }
 
   protected void assertExamplePersonEquals(List<ExamplePerson> expected, List<IMendixObject> results, ExamplePersonResult.MemberNames[] membersToCheck) throws CoreException {
