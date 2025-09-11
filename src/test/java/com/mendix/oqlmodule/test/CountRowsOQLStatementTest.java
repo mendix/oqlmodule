@@ -24,7 +24,7 @@ public class CountRowsOQLStatementTest extends OQLStatementTestSkeleton {
   }
 
   @Test
-  public void countRowsOQLStatementWithNullAmount() throws Exception {
+  public void countRowsOQLStatementWithNullAmount() {
     assertThrows(NullPointerException.class, () -> new CountRowsOQLStatement(this.context, selectAll, null, null).executeAction());
   }
 
@@ -34,12 +34,12 @@ public class CountRowsOQLStatementTest extends OQLStatementTestSkeleton {
   }
 
   @Test
-  public void countRowsOQLStatementFromDataset() throws Exception {
+  public void countRowsOQLStatementFromDataset() {
     assertThrows(MendixRuntimeException.class, () -> new CountRowsOQLStatement(this.context, "OQL.DataSet", 1000L, null).executeAction());
   }
 
   @Test
-  public void countRowsOQLStatementWithSelectStar() throws Exception {
+  public void countRowsOQLStatementWithSelectStar() {
     assertThrows(NullPointerException.class, () -> new CountRowsOQLStatement(this.context, selectStar, null, null).executeAction());
   }
 }
