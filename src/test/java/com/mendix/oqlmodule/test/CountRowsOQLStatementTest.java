@@ -11,16 +11,30 @@ public class CountRowsOQLStatementTest extends OQLStatementTestSkeleton {
 
   @Test
   public void countRowsOQLStatement() throws Exception {
-    Long count = new CountRowsOQLStatement(this.context, selectAll, 1000L, 1L).executeAction();
+    Long count = new CountRowsOQLStatement(this.context, selectAll, 0L, null).executeAction();
 
-    assertEquals(5L, count);
+    assertEquals(5, count);
   }
 
   @Test
-  public void countRowsOQLStatementWithSmallOffsetAndAmount() throws Exception {
+  public void countRowsOQLStatementWithOffset() throws Exception {
+    Long count = new CountRowsOQLStatement(this.context, selectAll, 0L, 1L).executeAction();
+
+    assertEquals(5, count);
+  }
+
+  @Test
+  public void countRowsOQLStatementWithOffsetAndNonZeroAmount() throws Exception {
     Long count = new CountRowsOQLStatement(this.context, selectAll, 2L, 1L).executeAction();
 
     assertEquals(2L, count);
+  }
+
+  @Test
+  public void countRowsOQLStatementWithNonZeroAmount() throws Exception {
+    Long count = new CountRowsOQLStatement(this.context, selectAll, 2L, null).executeAction();
+
+    assertEquals(2, count);
   }
 
   @Test
