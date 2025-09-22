@@ -10,7 +10,6 @@
 package oql.actions;
 
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
 import com.mendix.systemwideinterfaces.core.UserAction;
 

@@ -9,19 +9,14 @@
 
 package oql.actions;
 
-import java.util.List;
-import java.util.Map;
-import com.mendix.core.Core;
-import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.systemwideinterfaces.core.IMendixObject;
-import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
 import com.mendix.systemwideinterfaces.core.UserAction;
 
 /**
- * This action executes the OQL statement and returns the amount of rows which will be returned by the OQL statement.
- * The main purpose of this action was to avoid overhead of object creation while the interest is to determine if a record within the database exists.
+ * This action executes an OQL query and returns the amount of results
+ * 
+ * For further documentation please refer to https://docs.mendix.com/appstore/modules/oql-module#countrowsoqlstatement
  */
 public class CountRowsOQLStatement extends UserAction<java.lang.Long>
 {
@@ -47,12 +42,8 @@ public class CountRowsOQLStatement extends UserAction<java.lang.Long>
 	{
 		// BEGIN USER CODE
 		IContext context = getContext().createSudoClone();
-		ILogNode logger = Core.getLogger(this.getClass().getSimpleName());
-		
-		logger.debug("Mapping parameters.");
-		Map<String, Object> parameters = OQL.getNextParameters();
-		Long result = 
-				OQL.countRowsOQL(context, statement, amount, parameters);	
+
+		Long result = OQL.countRowsOQL(context, statement, amount);
 		
 		OQL.resetParameters();
 		return result;

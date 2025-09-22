@@ -9,65 +9,16 @@
 
 package oql.actions;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import com.mendix.core.Core;
-import com.mendix.logging.ILogNode;
-import com.mendix.systemwideinterfaces.connectionbus.data.IDataColumnSchema;
-import com.mendix.systemwideinterfaces.connectionbus.data.IDataRow;
-import com.mendix.systemwideinterfaces.connectionbus.data.IDataTable;
-import com.mendix.systemwideinterfaces.connectionbus.data.IDataTableSchema;
-import com.mendix.systemwideinterfaces.connectionbus.requests.IParameterMap;
-import com.mendix.systemwideinterfaces.connectionbus.requests.IRetrievalSchema;
-import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetRequest;
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
-import com.mendix.systemwideinterfaces.core.meta.IMetaAssociation;
-import com.mendix.webui.CustomJavaAction;
 import oql.implementation.OQL;
 import com.mendix.systemwideinterfaces.core.UserAction;
 
 /**
- * This action executes a given OQL statement and accepts parameters.
- * One can specify using the preserveParameters argument if parameters should be reset after invocation of this action.
+ * This action executes an OQL query and returns a list of Mendix objects
  * 
- * Statements can easily be developed using the DataSet and one can use the Mendix documentation (https://docs.mendix.com/refguide7/oql) as reference.
- * 
- * For each column, the action expects an attribute in the result entity with the same name.
- * If the result is the ID of an object, it expects an association with the same name (without the module prefix).
- * 
- * Parameters given should be a list of OQL.Parameter, having at least the ParameterName and ParameterType set.
- * ParameterNames follow the syntax $Name
- * 
- * Example query (taken from OQL.IVK_PerformTests):
- * 
- * SELECT 
- * 	P.id ExamplePersonResult_ExamplePerson,
- * 	P.Name Name,
- * 	P.Number Number,
- * 	P.DateOfBirth DateOfBirth,
- * 	P.Age Age,
- * 	P.LongAge LongAge,
- * 	P.HeightInFloat HeightInFloat,
- * 	P.HeightInDecimal HeightInDecimal,
- * 	P.Active Active,
- * 	P.Gender Gender
- * FROM
- * 	OQL.ExamplePerson P
- * WHERE
- * 	P.Active = $Active AND
- * 	P.Age = $Age AND
- * 	P.DateOfBirth = $DateOfBirth AND
- * 	P.Gender = $Gender AND
- * 	P.HeightInDecimal = $HeightInDecimal AND
- * 	P.HeightInFloat = $HeightInFloat AND
- * 	P.LongAge = $LongAge AND
- * 	P.Name = $Name AND
- * 	P.Number = $Number
- * 
+ * For further documentation please refer to https://docs.mendix.com/appstore/modules/oql-module#executeoqlstatement
  */
 public class ExecuteOQLStatement extends UserAction<java.util.List<IMendixObject>>
 {
@@ -99,12 +50,8 @@ public class ExecuteOQLStatement extends UserAction<java.util.List<IMendixObject
 	{
 		// BEGIN USER CODE
 		IContext context = getContext().createSudoClone();
-		ILogNode logger = Core.getLogger(this.getClass().getSimpleName());
-		
-		logger.debug("Mapping parameters.");
-		Map<String, Object> parameters = OQL.getNextParameters();
-		List<IMendixObject> result = 
-				OQL.executeOQL(context, statement, returnEntity, amount, offset, parameters);	
+
+		List<IMendixObject> result = OQL.executeOQL(context, statement, returnEntity, amount, offset);
 		
 		if (!this.preserveParameters) 
 			OQL.resetParameters();
