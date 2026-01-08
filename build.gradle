@@ -43,7 +43,7 @@ dependencies {
             [group: 'org.apache.commons', name: 'commons-text', version: '1.10.0']
     )
     
-    testImplementation('com.mendix.util:junit-helper:1.1.0') {
+    testImplementation('com.mendix.util:junit-helper:1.2.0') {
         exclude group: 'com.mendix', module: 'public-api'
     }
 
