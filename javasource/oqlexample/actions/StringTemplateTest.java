@@ -10,7 +10,6 @@
 package oqlexample.actions;
 
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.webui.CustomJavaAction;
 import com.mendix.systemwideinterfaces.core.UserAction;
 
 public class StringTemplateTest extends UserAction<java.lang.Void>
