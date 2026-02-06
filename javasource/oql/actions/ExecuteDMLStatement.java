@@ -9,8 +9,10 @@
 
 package oql.actions;
 
+import com.mendix.systemwideinterfaces.MendixRuntimeException;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.UserAction;
+import oql.implementation.OQL;
 
 /**
  * This action executes a DML statement and returns number of affected rows
@@ -34,7 +36,17 @@ public class ExecuteDMLStatement extends UserAction<java.lang.Long>
 	public java.lang.Long executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-		throw new com.mendix.systemwideinterfaces.MendixRuntimeException("Java action was not implemented");
+		        if (statement == null) {
+            throw new MendixRuntimeException("DML statement cannot be null");
+        }
+
+		IContext context = getContext().createSudoClone();
+
+		java.lang.Long result = OQL.executeDML(context, statement);
+		
+		OQL.resetParameters();
+		
+		return result;
 		// END USER CODE
 	}
 

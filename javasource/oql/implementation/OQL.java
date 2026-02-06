@@ -2,6 +2,7 @@ package oql.implementation;
 
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
+import com.mendix.datastorage.OqlStatement;
 import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataColumnSchema;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataRow;
@@ -152,6 +153,21 @@ public class OQL {
 		}
 
 		return result;
+	}
+
+		public static long executeDML(IContext context, String statement) throws CoreException {
+
+		OqlStatement oqlStatement  = Core.createOqlStatement(statement);
+
+		Map<String, Object> params = OQL.getNextParameters(); 
+
+		OQLParameterBinder.bindAll(oqlStatement, params);
+
+		int affected = oqlStatement.execute(context);
+
+		logger.debug(String.format("Rows affected'%s'",	affected));
+
+		return affected;
 	}
 
 	private static IMetaAssociation getAssociation(IMendixObject targetObj, IDataColumnSchema columnSchema) {
