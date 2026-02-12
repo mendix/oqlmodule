@@ -1,0 +1,1 @@
+We added the "CsvAsTable" widget to the list of files distributed with the module. Studio Pro will now recognize it when importing the OQL Module in a new project.
