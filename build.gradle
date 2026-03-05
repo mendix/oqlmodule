@@ -110,6 +110,8 @@ tasks.register('addOSSClearance', com.mendix.gradle.publish_module.AddFilesToMpk
 
 publishModuleToMarketplace {
     dependsOn addOSSClearance
+
+    addOSSClearance.mustRunAfter addFilesToMpk
 }
 
 exportModule {
