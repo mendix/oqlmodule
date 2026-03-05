@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.mendix.gradle.publish-module-plugin' version '1.21'
+    id 'com.mendix.gradle.publish-module-plugin' version '1.24'
     id 'net.researchgate.release' version '2.8.1'
 }
 
@@ -19,14 +19,14 @@ repositories {
 }
 
 mxMarketplace {
-    appNumber     = 66876
-    appName       = "OQLModule"
-    moduleName    = "OQL"
-    moduleLicense = "Apache V2"
-    filterWidgets = false
+    appNumber          = 66876
+    appName            = "OQLModule"
+    moduleName         = "OQL"
+    moduleLicense      = "MIT"
+    filterWidgets      = false
     filterRequiredLibs = true
-    appDirectory      = "."
-    includeFiles  = List.of(ossClearanceFile, licenseFile, CsvAsTableWidgetFile)
+    appDirectory       = "."
+    includeFiles       = List.of(licenseFile, CsvAsTableWidgetFile)
     versionPathPrefix = "__Version " // the path prefix within the module to the version folder
 }
 
@@ -101,6 +101,17 @@ tasks.register('cleanTest') {
     copyJarsToUserlib.mustRunAfter clean
     mxBuild.mustRunAfter copyJarsToUserlib
     test.mustRunAfter mxBuild
+}
+
+tasks.register('addOSSClearance', com.mendix.gradle.publish_module.AddFilesToMpkTask) {
+    includeFiles = files(ossClearanceFile)
+    inputMpkFile = file("${mxMarketplace.moduleName}_${version}.mpk")
+}
+
+publishModuleToMarketplace {
+    dependsOn addOSSClearance
+
+    addOSSClearance.mustRunAfter addFilesToMpk
 }
 
 exportModule {
