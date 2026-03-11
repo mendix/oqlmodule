@@ -34,3 +34,12 @@
 
 #Other
 /releases/
+/packages/
+/oqlmodule.mpr.bak
+/oqlmodule.mpr.lock
+/modeler-merge-marker
+/nativemobile/builds/
+/vendorlib/temp/
+.DS_Store
+/.svn/
+/mprcontents/mprjournal*
