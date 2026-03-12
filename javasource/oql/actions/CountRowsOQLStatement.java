@@ -10,8 +10,8 @@
 package oql.actions;
 
 import com.mendix.systemwideinterfaces.core.IContext;
-import oql.implementation.OQL;
 import com.mendix.systemwideinterfaces.core.UserAction;
+import oql.implementation.OQL;
 
 /**
  * This action executes an OQL query and returns the amount of results

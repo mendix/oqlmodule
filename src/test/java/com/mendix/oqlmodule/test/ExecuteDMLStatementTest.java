@@ -4,53 +4,55 @@ import com.mendix.systemwideinterfaces.MendixRuntimeException;
 import oql.actions.ExecuteDMLStatement;
 import oqlexample.proxies.ExampleData;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ExecuteDMLStatementTest extends OQLStatementTestSkeleton {
 
-    @Test
-    public void executeValidUpdateDMLStatement() throws Exception {
-        ExampleData example = new ExampleData(this.context);
-        example.setContents("Before");
-        example.commit();
+  @Test
+  public void executeValidUpdateDMLStatement() throws Exception {
+    ExampleData example = new ExampleData(this.context);
+    example.setContents("Before");
+    example.commit();
 
-        String updateStmt =
-            "UPDATE OQLExample.ExampleData SET Contents = 'After' WHERE id = '" +
-                example.getMendixObject().getId().toLong() + "'";
+    String updateStmt =
+      "UPDATE OQLExample.ExampleData SET Contents = 'After' WHERE id = '" +
+        example.getMendixObject().getId().toLong() + "'";
 
-        Long result = new ExecuteDMLStatement(this.context, updateStmt)
-            .executeAction();
+    Long result = new ExecuteDMLStatement(this.context, updateStmt)
+      .executeAction();
 
-        assertEquals(1L, result);
-    }
+    assertEquals(1L, result);
+  }
 
-    @Test
-    public void executeValidDeleteDMLStatement() throws Exception {
-        ExampleData example = new ExampleData(this.context);
-        example.setContents("ToDelete");
-        example.commit();
+  @Test
+  public void executeValidDeleteDMLStatement() throws Exception {
+    ExampleData example = new ExampleData(this.context);
+    example.setContents("ToDelete");
+    example.commit();
 
-        String deleteStmt =
-            "DELETE FROM OQLExample.ExampleData WHERE Contents = 'ToDelete'";
+    String deleteStmt =
+      "DELETE FROM OQLExample.ExampleData WHERE Contents = 'ToDelete'";
 
-        java.lang.Long result = new ExecuteDMLStatement(this.context, deleteStmt)
-            .executeAction();
+    java.lang.Long result = new ExecuteDMLStatement(this.context, deleteStmt)
+      .executeAction();
 
-        assertEquals(1L, result);
-    }
+    assertEquals(1L, result);
+  }
 
-    @Test
-    public void executeDMLWithNullStatement() {
-        assertThrows(MendixRuntimeException.class, () ->
-            new ExecuteDMLStatement(this.context, null).executeAction()
-        );
-    }
+  @Test
+  public void executeDMLWithNullStatement() {
+    assertThrows(MendixRuntimeException.class, () ->
+      new ExecuteDMLStatement(this.context, null).executeAction()
+    );
+  }
 
-    @Test
-    public void executeDMLWithInvalidStatement() {
-        assertThrows(Exception.class, () ->
-            new ExecuteDMLStatement(this.context, "BAD OQL").executeAction()
-        );
-    }
+  @Test
+  public void executeDMLWithInvalidStatement() {
+    assertThrows(Exception.class, () ->
+      new ExecuteDMLStatement(this.context, "BAD OQL").executeAction()
+    );
+  }
 }
 

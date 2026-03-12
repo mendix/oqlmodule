@@ -36,16 +36,16 @@ public class ExecuteDMLStatement extends UserAction<java.lang.Long>
 	public java.lang.Long executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-		        if (statement == null) {
-            throw new MendixRuntimeException("DML statement cannot be null");
-        }
+		if (statement == null) {
+			throw new MendixRuntimeException("DML statement cannot be null");
+		}
 
 		IContext context = getContext().createSudoClone();
 
 		java.lang.Long result = OQL.executeDML(context, statement);
-		
+
 		OQL.resetParameters();
-		
+
 		return result;
 		// END USER CODE
 	}

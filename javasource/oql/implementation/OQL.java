@@ -20,13 +20,15 @@ import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive;
 import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive.PrimitiveType;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class OQL {
-	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<>();
-
 	private static final ILogNode logger = Core.getLogger(OQL.class.getSimpleName());
+	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<>();
 
 	public static Map<String, Object> getNextParameters() {
 		if (nextParameters.get() == null) {
@@ -138,7 +140,7 @@ public class OQL {
 						}
 
 						if (value instanceof Integer && primitive.getType() == PrimitiveType.Long) {
-							value = (Long) ((Integer) value).longValue();
+							value = ((Integer) value).longValue();
 						} else if (value instanceof Long && primitive.getType() == PrimitiveType.Integer) {
 							value = Integer.parseInt(((Long) value).toString()); // not so happy way of conversion
 						} else if (value instanceof Double && primitive.getType() == PrimitiveType.Decimal) {
@@ -155,17 +157,17 @@ public class OQL {
 		return result;
 	}
 
-		public static long executeDML(IContext context, String statement) throws CoreException {
+	public static long executeDML(IContext context, String statement) throws CoreException {
 
-		OqlStatement oqlStatement  = Core.createOqlStatement(statement);
+		OqlStatement oqlStatement = Core.createOqlStatement(statement);
 
-		Map<String, Object> params = OQL.getNextParameters(); 
+		Map<String, Object> params = OQL.getNextParameters();
 
 		OQLParameterBinder.bindAll(oqlStatement, params);
 
 		int affected = oqlStatement.execute(context);
 
-		logger.debug(String.format("Rows affected'%s'",	affected));
+		logger.debug(String.format("Rows affected'%s'", affected));
 
 		return affected;
 	}
