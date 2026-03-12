@@ -85,7 +85,7 @@ public class OQL {
 		request.setRetrievalSchema(schema);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Executing query\n:" + statement);
+			logger.debug("Executing query:\n" + statement);
 		}
 		IDataTable results = Core.retrieveOQLDataTable(context, request);
 		if (logger.isDebugEnabled()) {
@@ -157,17 +157,19 @@ public class OQL {
 		return result;
 	}
 
-	public static long executeDML(IContext context, String statement) throws CoreException {
+	public static long executeDML(IContext context, String statement) {
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing statement:\n" + statement);
+		}
 		OqlStatement oqlStatement = Core.createOqlStatement(statement);
-
 		Map<String, Object> params = OQL.getNextParameters();
-
 		OQLParameterBinder.bindAll(oqlStatement, params);
 
 		int affected = oqlStatement.execute(context);
-
-		logger.debug(String.format("Rows affected'%s'", affected));
+		if (logger.isDebugEnabled()) {
+			logger.debug("Rows affected '" + affected + "'");
+		}
 
 		return affected;
 	}
@@ -183,5 +185,4 @@ public class OQL {
 			.findFirst()
 			.orElse(null);
 	}
-
 }
