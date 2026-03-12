@@ -69,11 +69,4 @@ public class ExecuteDMLStatementWithParametersTest extends OQLStatementTestSkele
 
     assertEquals(1L, result);
   }
-
-  private ExampleData createExample(String contents, Long counter) throws Exception {
-    ExampleData d = new ExampleData(this.context);
-    d.setContents(contents);
-    d.commit();
-    return d;
-  }
 }

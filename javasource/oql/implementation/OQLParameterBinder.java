@@ -34,10 +34,6 @@ public final class OQLParameterBinder {
 					+ "cannot infer correct OqlStatement#setVariable overload.");
 			}
 
-			if (params == null || params.isEmpty()) {
-				return;
-			}
-
 			// Exact types first (to avoid accidental widening)
 			if (value instanceof BigDecimal) {
 				stmt.setVariable(name, (BigDecimal) value);
