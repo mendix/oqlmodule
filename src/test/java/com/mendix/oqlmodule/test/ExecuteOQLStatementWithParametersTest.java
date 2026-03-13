@@ -25,7 +25,7 @@ public class ExecuteOQLStatementWithParametersTest extends OQLStatementTestSkele
   }
 
   @Test
-  public void executeOQLStatementWithBooleanDateTimeParameter() throws Exception {
+  public void executeOQLStatementWithDateTimeParameter() throws Exception {
     final String selectSomeWithArgument = selectSome + " WHERE DateOfBirth = $Param";
     new AddDateTimeParameter(this.context, "Param", new GregorianCalendar(100, GregorianCalendar.FEBRUARY, 2).getTime()).executeAction();
     List<IMendixObject> oqlResult = new ExecuteOQLStatement(this.context, selectSomeWithArgument, ExamplePersonResult.entityName, null, null, false)

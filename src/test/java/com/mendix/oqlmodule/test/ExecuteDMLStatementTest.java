@@ -1,9 +1,12 @@
 package com.mendix.oqlmodule.test;
 
 import com.mendix.systemwideinterfaces.MendixRuntimeException;
+import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import oql.actions.ExecuteDMLStatement;
 import oqlexample.proxies.ExampleData;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,15 +18,16 @@ public class ExecuteDMLStatementTest extends OQLStatementTestSkeleton {
     ExampleData example = new ExampleData(this.context);
     example.setContents("Before");
     example.commit();
+    IMendixIdentifier exampleObjectId = example.getMendixObject().getId();
 
-    String updateStmt =
-      "UPDATE OQLExample.ExampleData SET Contents = 'After' WHERE id = '" +
-        example.getMendixObject().getId().toLong() + "'";
+    String updateStmt = "UPDATE OQLExample.ExampleData SET Contents = 'After' WHERE id = '" + exampleObjectId.toLong() + "'";
 
-    Long result = new ExecuteDMLStatement(this.context, updateStmt)
-      .executeAction();
+    Long affectedRows = new ExecuteDMLStatement(this.context, updateStmt).executeAction();
 
-    assertEquals(1L, result);
+    assertEquals(1L, affectedRows);
+
+    ExampleData updatedExample = ExampleData.load(this.context, exampleObjectId);
+    assertEquals("After", updatedExample.getContents());
   }
 
   @Test
@@ -35,10 +39,12 @@ public class ExecuteDMLStatementTest extends OQLStatementTestSkeleton {
     String deleteStmt =
       "DELETE FROM OQLExample.ExampleData WHERE Contents = 'ToDelete'";
 
-    java.lang.Long result = new ExecuteDMLStatement(this.context, deleteStmt)
-      .executeAction();
+    Long affectedRows = new ExecuteDMLStatement(this.context, deleteStmt).executeAction();
 
-    assertEquals(1L, result);
+    assertEquals(1L, affectedRows);
+
+    List<?> deletedObjects = ExampleData.load(this.context, "[Contents = 'ToDelete']");
+    assertEquals(0, deletedObjects.size());
   }
 
   @Test
