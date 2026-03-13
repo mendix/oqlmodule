@@ -20,10 +20,7 @@ import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive;
 import com.mendix.systemwideinterfaces.core.meta.IMetaPrimitive.PrimitiveType;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class OQL {
@@ -164,7 +161,24 @@ public class OQL {
 		}
 		OqlStatement oqlStatement = Core.createOqlStatement(statement);
 		Map<String, Object> params = OQL.getNextParameters();
-		OQLParameterBinder.bindAll(oqlStatement, params);
+
+		for (Map.Entry<String, ?> e : params.entrySet()) {
+			final String name = e.getKey();
+			final Object value = e.getValue();
+
+			switch (value) {
+				case null -> throw new IllegalArgumentException("Parameter '" + name + "' is null.");
+				case Boolean b -> oqlStatement.setVariable(name, b);
+				case BigDecimal bd -> oqlStatement.setVariable(name, bd);
+				case Long l -> oqlStatement.setVariable(name, l);
+				case IMendixIdentifier id -> oqlStatement.setVariable(name, id);
+				case String s -> oqlStatement.setVariable(name, s);
+				default -> throw new IllegalArgumentException("Parameter '" + name + "' has an unsupported type.");
+			}
+			if (logger.isTraceEnabled()) {
+				logger.trace("Set parameter " + name + " to " + value);
+			}
+		}
 
 		int affected = oqlStatement.execute(context);
 		if (logger.isDebugEnabled()) {

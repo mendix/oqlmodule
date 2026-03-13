@@ -6,7 +6,7 @@ plugins {
 
 apply from: 'environment.gradle'
 
-sourceCompatibility = '11'
+sourceCompatibility = '21'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
