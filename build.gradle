@@ -6,7 +6,7 @@ plugins {
 
 apply from: 'environment.gradle'
 
-sourceCompatibility = '11'
+sourceCompatibility = '21'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
@@ -27,7 +27,7 @@ mxMarketplace {
     filterRequiredLibs = true
     appDirectory       = "."
     includeFiles       = List.of(licenseFile, CsvAsTableWidgetFile)
-    versionPathPrefix = "__Version " // the path prefix within the module to the version folder
+    versionPathPrefix  = "__Version " // the path prefix within the module to the version folder
 }
 
 dependencies {

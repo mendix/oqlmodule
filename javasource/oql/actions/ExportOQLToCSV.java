@@ -9,21 +9,6 @@
 
 package oql.actions;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import com.mendix.core.Core;
 import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataColumnSchema;
@@ -35,10 +20,20 @@ import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetR
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
+import com.mendix.systemwideinterfaces.core.UserAction;
 import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
-import com.mendix.systemwideinterfaces.core.UserAction;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Java action that executes an OQL query and saves the result in a CSV file stored in an object of the specified FileDocument entity, which is then returned
@@ -84,7 +79,7 @@ public class ExportOQLToCSV extends UserAction<IMendixObject>
 	{
 		// BEGIN USER CODE
 		final int PAGE_SIZE = 10000;
-		
+
 		ILogNode logger = Core.getLogger(this.getClass().getSimpleName());
 		String suffix = ".csv";
 		if (this.zipResult) {
@@ -102,35 +97,35 @@ public class ExportOQLToCSV extends UserAction<IMendixObject>
 			os = fos;
 		}
 
-		MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), 
-                this.separatorChar.charAt(0), 
-                this.quoteChar != null ? Optional.of(this.quoteChar.charAt(0)) : Optional.empty(),
-                this.escapeChar != null ? Optional.of(this.escapeChar.charAt(0)) : Optional.empty());
+		MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os),
+			this.separatorChar.charAt(0),
+			this.quoteChar != null ? Optional.of(this.quoteChar.charAt(0)) : Optional.empty(),
+			this.escapeChar != null ? Optional.of(this.escapeChar.charAt(0)) : Optional.empty());
 
 		IMendixObject result = Core.instantiate(getContext(), this.returnEntity);
-		
+
 		logger.debug("Executing query");
-		
+
 		int offset = 0;
-		while(true) {
+		while (true) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Executing query offset " + offset);
 			}
-			
+
 			IContext context = getContext().createSudoClone();
 			IDataTable results = Core.retrieveOQLDataTable(context, buildRequest(statement, offset, PAGE_SIZE));
-			
+
 			if (this.exportHeaders && offset == 0) {
 				List<String> headers = results.getSchema()
-						.getColumnSchemas()
-						.stream()
-						.map(IDataColumnSchema::getName)
-						.collect(Collectors.toCollection(ArrayList::new));
+					.getColumnSchemas()
+					.stream()
+					.map(IDataColumnSchema::getName)
+					.collect(Collectors.toCollection(ArrayList::new));
 				writer.writeRow(headers);
 			}
 
 			writeResults(results, writer);
-			
+
 			if (results.getRowCount() != PAGE_SIZE) {
 				break;
 			}
@@ -159,12 +154,12 @@ public class ExportOQLToCSV extends UserAction<IMendixObject>
 	private IOQLTextGetRequest buildRequest(String statement, int offset, int pagesize) {
 		IOQLTextGetRequest request;
 		try {
-			request = Core.createOQLTextGetRequestFromDataSet(statement); 
+			request = Core.createOQLTextGetRequestFromDataSet(statement);
 		} catch (IllegalArgumentException e) {
 			request = Core.createOQLTextGetRequest();
 			request.setQuery(statement);
 		}
-		
+
 		IParameterMap parameterMap = request.createParameterMap();
 		IRetrievalSchema schema = Core.createRetrievalSchema();
 		schema.setAmount(pagesize);
@@ -176,30 +171,30 @@ public class ExportOQLToCSV extends UserAction<IMendixObject>
 		request.setParameters(parameterMap);
 		return request;
 	}
-	
+
 	private void writeResults(IDataTable results, MxCSVWriter writer) throws IOException {
 		for (IDataRow row : results.getRows()) {
 			List<String> values = IntStream
-					.range(0, results.getSchema().getColumnCount())
-					.mapToObj(index -> row.getValue(getContext(), index))
-					.map(value -> {
-						if (value == null) return "";
-						else {
-							if (value instanceof Date) {
-								return Long.toString(((Date) value).getTime()); // use timestamp to export for more precision than just seconds.
-							} else if (value instanceof IMendixIdentifier) {
-								return Long.toString(((IMendixIdentifier) value).toLong());
-							} else {
-								return value.toString();
-							}
+				.range(0, results.getSchema().getColumnCount())
+				.mapToObj(index -> row.getValue(getContext(), index))
+				.map(value -> {
+					if (value == null) return "";
+					else {
+						if (value instanceof Date) {
+							return Long.toString(((Date) value).getTime()); // use timestamp to export for more precision than just seconds.
+						} else if (value instanceof IMendixIdentifier) {
+							return Long.toString(((IMendixIdentifier) value).toLong());
+						} else {
+							return value.toString();
 						}
-					})
-					.map(value -> this.removeNewLinesFromValues ? value.replaceAll("(\r\n|\n|\r)", " ") : value)
-					.collect(Collectors.toCollection(ArrayList::new));
+					}
+				})
+				.map(value -> this.removeNewLinesFromValues ? value.replaceAll("(\r\n|\n|\r)", " ") : value)
+				.collect(Collectors.toCollection(ArrayList::new));
 			writer.writeRow(values);
 		}
 	}
 
-	
+
 	// END EXTRA CODE
 }

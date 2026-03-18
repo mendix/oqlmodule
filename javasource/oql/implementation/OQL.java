@@ -2,6 +2,7 @@ package oql.implementation;
 
 import com.mendix.core.Core;
 import com.mendix.core.CoreException;
+import com.mendix.datastorage.OqlStatement;
 import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataColumnSchema;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataRow;
@@ -23,9 +24,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class OQL {
-	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<>();
-
 	private static final ILogNode logger = Core.getLogger(OQL.class.getSimpleName());
+	static ThreadLocal<Map<String, Object>> nextParameters = new ThreadLocal<>();
 
 	public static Map<String, Object> getNextParameters() {
 		if (nextParameters.get() == null) {
@@ -82,7 +82,7 @@ public class OQL {
 		request.setRetrievalSchema(schema);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Executing query\n:" + statement);
+			logger.debug("Executing query:\n" + statement);
 		}
 		IDataTable results = Core.retrieveOQLDataTable(context, request);
 		if (logger.isDebugEnabled()) {
@@ -137,7 +137,7 @@ public class OQL {
 						}
 
 						if (value instanceof Integer && primitive.getType() == PrimitiveType.Long) {
-							value = (Long) ((Integer) value).longValue();
+							value = ((Integer) value).longValue();
 						} else if (value instanceof Long && primitive.getType() == PrimitiveType.Integer) {
 							value = Integer.parseInt(((Long) value).toString()); // not so happy way of conversion
 						} else if (value instanceof Double && primitive.getType() == PrimitiveType.Decimal) {
@@ -154,6 +154,40 @@ public class OQL {
 		return result;
 	}
 
+	public static long executeDML(IContext context, String statement) {
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Executing statement:\n" + statement);
+		}
+		OqlStatement oqlStatement = Core.createOqlStatement(statement);
+		Map<String, Object> params = OQL.getNextParameters();
+
+		for (Map.Entry<String, ?> e : params.entrySet()) {
+			final String name = e.getKey();
+			final Object value = e.getValue();
+
+			switch (value) {
+				case null -> throw new IllegalArgumentException("Parameter '" + name + "' is null.");
+				case Boolean b -> oqlStatement.setVariable(name, b);
+				case BigDecimal bd -> oqlStatement.setVariable(name, bd);
+				case Long l -> oqlStatement.setVariable(name, l);
+				case IMendixIdentifier id -> oqlStatement.setVariable(name, id);
+				case String s -> oqlStatement.setVariable(name, s);
+				default -> throw new IllegalArgumentException("Parameter '" + name + "' has an unsupported type.");
+			}
+			if (logger.isTraceEnabled()) {
+				logger.trace("Set parameter " + name + " to " + value);
+			}
+		}
+
+		int affected = oqlStatement.execute(context);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Rows affected '" + affected + "'");
+		}
+
+		return affected;
+	}
+
 	private static IMetaAssociation getAssociation(IMendixObject targetObj, IDataColumnSchema columnSchema) {
 		String columnSchemaPattern = columnSchema.getName().contains(".") ? columnSchema.getName() : "[^.]+\\." + columnSchema.getName();
 
@@ -165,5 +199,4 @@ public class OQL {
 			.findFirst()
 			.orElse(null);
 	}
-
 }

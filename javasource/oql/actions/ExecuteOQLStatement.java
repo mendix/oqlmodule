@@ -9,11 +9,11 @@
 
 package oql.actions;
 
-import java.util.List;
 import com.mendix.systemwideinterfaces.core.IContext;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
-import oql.implementation.OQL;
 import com.mendix.systemwideinterfaces.core.UserAction;
+import oql.implementation.OQL;
+import java.util.List;
 
 /**
  * This action executes an OQL query and returns a list of Mendix objects
@@ -52,10 +52,10 @@ public class ExecuteOQLStatement extends UserAction<java.util.List<IMendixObject
 		IContext context = getContext().createSudoClone();
 
 		List<IMendixObject> result = OQL.executeOQL(context, statement, returnEntity, amount, offset);
-		
-		if (!this.preserveParameters) 
+
+		if (!this.preserveParameters)
 			OQL.resetParameters();
-		
+
 		return result;
 		// END USER CODE
 	}
