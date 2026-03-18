@@ -1,0 +1,2 @@
+We upgraded the module to Mendix version 11.6.0
+We added a new action called ExecuteDMLStatement to execute OQL Statements (DELETE, UPDATE and INSERT)
