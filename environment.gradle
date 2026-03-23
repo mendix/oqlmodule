@@ -6,6 +6,6 @@ def mxInstallVersion = System.getenv('MODELER_VERSION') ?: System.getenv('MX_INS
 
 project.ext.mxInstallPath = "${mxPath}/${mxInstallVersion}"
 project.ext.mxRuntimeBundles = new File("${mxInstallPath}/runtime/bundles")
-project.ext.ossClearanceFile = file("SiemensMendixOQL__4.1.2__READMEOSS.html")
+project.ext.ossClearanceFile = file("SiemensMendixOQL__5.0.0__READMEOSS.html")
 project.ext.licenseFile = file("LICENSE.txt")
 project.ext.CsvAsTableWidgetFile = file("widgets/mendix.CsvAsTable.mpk")
