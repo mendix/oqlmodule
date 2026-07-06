@@ -22,6 +22,14 @@ import com.mendix.systemwideinterfaces.core.UserAction;
 import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Java action that executes an OQL query and returns the result as a formatted markdown table.
@@ -43,7 +51,38 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 	public java.lang.String executeAction() throws Exception
 	{
 		// BEGIN USER CODE
-		throw new com.mendix.systemwideinterfaces.MendixRuntimeException("Java action was not implemented");
+		final int PAGE_SIZE = 10000;
+
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+			MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), '|', Optional.empty(), Optional.empty(), Optional.of('|'), Optional.of('|'))) {
+
+			int offset = 0;
+			while (true) {
+
+				IContext context = getContext().createSudoClone();
+				IDataTable results = Core.retrieveOQLDataTable(context, buildRequest(query, offset, PAGE_SIZE));
+
+				if (offset == 0) {
+					List<String> headers = results.getSchema()
+						.getColumnSchemas()
+						.stream()
+						.map(IDataColumnSchema::getName)
+						.collect(Collectors.toCollection(ArrayList::new));
+					writer.writeRow(headers);
+					writer.writeRow(Collections.nCopies(headers.size(), "-"));
+				}
+
+				writeResults(results, writer);
+
+				if (results.getRowCount() != PAGE_SIZE) {
+					break;
+				}
+				offset += PAGE_SIZE;
+			}
+			OQL.resetParameters();
+		
+			return os.toString();
+		}
 		// END USER CODE
 	}
 
@@ -58,5 +97,42 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 	}
 
 	// BEGIN EXTRA CODE
+	private IOQLTextGetRequest buildRequest(String statement, int offset, int pagesize) {
+		IOQLTextGetRequest request = Core.createOQLTextGetRequest();
+		request.setQuery(statement);
+
+		IParameterMap parameterMap = request.createParameterMap();
+		IRetrievalSchema schema = Core.createRetrievalSchema();
+		schema.setAmount(pagesize);
+		schema.setOffset(offset);
+		request.setRetrievalSchema(schema);
+		for (Entry<String, Object> entry : OQL.getNextParameters().entrySet()) {
+			parameterMap.put(entry.getKey(), entry.getValue());
+		}
+		request.setParameters(parameterMap);
+		return request;
+	}
+
+	private void writeResults(IDataTable results, MxCSVWriter writer) throws IOException {
+		for (IDataRow row : results.getRows()) {
+			List<String> values = IntStream
+				.range(0, results.getSchema().getColumnCount())
+				.mapToObj(index -> row.getValue(getContext(), index))
+				.map(value -> {
+					if (value == null) return "";
+					else {
+						if (value instanceof Date) {
+							return Long.toString(((Date) value).getTime()); // use timestamp to export for more precision than just seconds.
+						} else if (value instanceof IMendixIdentifier) {
+							return Long.toString(((IMendixIdentifier) value).toLong());
+						} else {
+							return value.toString().replaceAll("(\r\n|\n|\r)", " ");
+						}
+					}
+				})
+				.collect(Collectors.toCollection(ArrayList::new));
+			writer.writeRow(values);
+		}
+	}
 	// END EXTRA CODE
 }
