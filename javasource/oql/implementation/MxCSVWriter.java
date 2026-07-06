@@ -12,25 +12,37 @@ import java.util.stream.Stream;
 
 public class MxCSVWriter implements Closeable {
 
-  protected Writer writer;
-  protected List<Character> specialCharactersToEscape;
-  protected char separatorChar;
-  protected Optional<Character> quoteChar;
-  protected Optional<Character> escapeChar;
-  protected String lineEnd = "\r\n";
+	protected Writer writer;
+	protected List<Character> specialCharactersToEscape;
+	protected char separatorChar;
+	protected Optional<Character> quoteChar;
+	protected Optional<Character> escapeChar;
+	protected Optional<Character> initialChar;
+	protected Optional<Character> endChar;
+	protected String lineEnd = "\r\n";
 
-  public MxCSVWriter(Writer writer, char separatorChar, Optional<Character> quoteChar, Optional<Character> escapeChar) {
-    this.writer = writer;
-    this.separatorChar = separatorChar;
-    this.quoteChar = quoteChar;
-    this.escapeChar = escapeChar;
-    specialCharactersToEscape = defineSpecialCharactersToEscape();
-  }
+	public MxCSVWriter(Writer writer, char separatorChar, Optional<Character> quoteChar, Optional<Character> escapeChar,
+			Optional<Character> initialChar, Optional<Character> endChar) {
+		this.writer = writer;
+		this.separatorChar = separatorChar;
+		this.quoteChar = quoteChar;
+		this.escapeChar = escapeChar;
+		this.initialChar = initialChar;
+		this.endChar = endChar;
+		specialCharactersToEscape = defineSpecialCharactersToEscape();
+	}
 
-  public void writeRow(List<String> columns) throws IOException {
-    StringBuilder rowBuilder = new StringBuilder(1024);
-    
-    for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++) {
+	public MxCSVWriter(Writer writer, char separatorChar, Optional<Character> quoteChar,
+			Optional<Character> escapeChar) {
+		this(writer, separatorChar, quoteChar, escapeChar, Optional.empty(), Optional.empty());
+	}
+
+	public void writeRow(List<String> columns) throws IOException {
+		StringBuilder rowBuilder = new StringBuilder(1024);
+
+		initialChar.ifPresent(rowBuilder::append);
+
+		for (int columnIndex = 0; columnIndex < columns.size(); columnIndex++) {
 
       if (columnIndex != 0) {
         rowBuilder.append(separatorChar);
@@ -38,10 +50,12 @@ public class MxCSVWriter implements Closeable {
 
       String nextValue = columns.get(columnIndex);
 
-      quoteChar.ifPresent(rowBuilder::append);
-      writeValue(rowBuilder, nextValue);
-      quoteChar.ifPresent(rowBuilder::append);
-    }
+			quoteChar.ifPresent(rowBuilder::append);
+			writeValue(rowBuilder, nextValue);
+			quoteChar.ifPresent(rowBuilder::append);
+		}
+		
+		endChar.ifPresent(rowBuilder::append);
 
     rowBuilder.append(lineEnd);
     writer.write(rowBuilder.toString());
