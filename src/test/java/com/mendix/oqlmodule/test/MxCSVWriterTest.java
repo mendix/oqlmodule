@@ -25,7 +25,8 @@ public class MxCSVWriterTest {
     defaultWriter = new MxCSVWriter(new OutputStreamWriter(output),
       ',',
       Optional.of('"'),
-      Optional.of('\\'));
+      Optional.of('\\'),
+      true);
   }
 
   String writeAndGetResult(MxCSVWriter writer, List<List<String>> columns) throws IOException {
@@ -66,7 +67,8 @@ public class MxCSVWriterTest {
     MxCSVWriter writerWithoutQuote = new MxCSVWriter(new OutputStreamWriter(output),
       ',',
       Optional.empty(),
-      Optional.of('\\'));
+      Optional.of('\\'),
+      true);
 
     List<List<String>> toWrite = List.of(List.of(",", "\r\n"),
       List.of("\\", "\""));
