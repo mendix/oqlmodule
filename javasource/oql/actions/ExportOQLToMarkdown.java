@@ -11,25 +11,21 @@ package oql.actions;
 
 import com.mendix.core.Core;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataColumnSchema;
-import com.mendix.systemwideinterfaces.connectionbus.data.IDataRow;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataTable;
 import com.mendix.systemwideinterfaces.connectionbus.requests.IParameterMap;
 import com.mendix.systemwideinterfaces.connectionbus.requests.IRetrievalSchema;
 import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetRequest;
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.UserAction;
 import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Java action that executes an OQL query and returns the result as a formatted markdown table.
@@ -54,7 +50,7 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 		final int PAGE_SIZE = 10000;
 
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-			MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), '|', Optional.empty(), Optional.empty(), Optional.of('|'), Optional.of('|'))) {
+			MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), '|', Optional.empty(), Optional.empty(), Optional.of('|'), Optional.of('|'), true)) {
 
 			int offset = 0;
 			while (true) {
@@ -72,7 +68,7 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 					writer.writeRow(Collections.nCopies(headers.size(), "-"));
 				}
 
-				writeResults(results, writer);
+				writer.writeDataTable(results, getContext());
 
 				if (results.getRowCount() != PAGE_SIZE) {
 					break;
@@ -111,28 +107,6 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 		}
 		request.setParameters(parameterMap);
 		return request;
-	}
-
-	private void writeResults(IDataTable results, MxCSVWriter writer) throws IOException {
-		for (IDataRow row : results.getRows()) {
-			List<String> values = IntStream
-				.range(0, results.getSchema().getColumnCount())
-				.mapToObj(index -> row.getValue(getContext(), index))
-				.map(value -> {
-					if (value == null) return "";
-					else {
-						if (value instanceof Date) {
-							return Long.toString(((Date) value).getTime()); // use timestamp to export for more precision than just seconds.
-						} else if (value instanceof IMendixIdentifier) {
-							return Long.toString(((IMendixIdentifier) value).toLong());
-						} else {
-							return value.toString().replaceAll("(\r\n|\n|\r)", " ");
-						}
-					}
-				})
-				.collect(Collectors.toCollection(ArrayList::new));
-			writer.writeRow(values);
-		}
 	}
 	// END EXTRA CODE
 }
