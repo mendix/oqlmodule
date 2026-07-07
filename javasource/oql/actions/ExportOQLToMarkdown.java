@@ -49,8 +49,8 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 		// BEGIN USER CODE
 		final int PAGE_SIZE = 10000;
 
-		try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-			MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), '|', Optional.empty(), Optional.empty(), Optional.of('|'), Optional.of('|'), true)) {
+		try (StringWriter stringWriter = new StringWriter();
+			MxCSVWriter writer = new MxCSVWriter(stringWriter, '|', Optional.empty(), Optional.of('\\'), Optional.of('|'), Optional.of('|'), true)) {
 
 			int offset = 0;
 			while (true) {
@@ -77,7 +77,7 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 			}
 			OQL.resetParameters();
 		
-			return os.toString();
+			return stringWriter.toString();
 		}
 		// END USER CODE
 	}
