@@ -12,28 +12,23 @@ package oql.actions;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import com.mendix.core.Core;
 import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataColumnSchema;
-import com.mendix.systemwideinterfaces.connectionbus.data.IDataRow;
 import com.mendix.systemwideinterfaces.connectionbus.data.IDataTable;
 import com.mendix.systemwideinterfaces.connectionbus.requests.IParameterMap;
 import com.mendix.systemwideinterfaces.connectionbus.requests.IRetrievalSchema;
 import com.mendix.systemwideinterfaces.connectionbus.requests.types.IOQLTextGetRequest;
 import com.mendix.systemwideinterfaces.core.IContext;
-import com.mendix.systemwideinterfaces.core.IMendixIdentifier;
 import com.mendix.systemwideinterfaces.core.IMendixObject;
 import com.mendix.webui.CustomJavaAction;
 import oql.implementation.MxCSVWriter;
@@ -87,10 +82,11 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 			os = fos;
 		}
 
-		MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os), 
-                this.separatorChar.charAt(0), 
-                this.quoteChar != null ? Optional.of(this.quoteChar.charAt(0)) : Optional.empty(),
-                this.escapeChar != null ? Optional.of(this.escapeChar.charAt(0)) : Optional.empty());
+		MxCSVWriter writer = new MxCSVWriter(new OutputStreamWriter(os),
+			this.separatorChar.charAt(0),
+			this.quoteChar != null ? Optional.of(this.quoteChar.charAt(0)) : Optional.empty(),
+			this.escapeChar != null ? Optional.of(this.escapeChar.charAt(0)) : Optional.empty(),
+			this.removeNewLinesFromValues);
 
 		IMendixObject result = Core.instantiate(getContext(), this.returnEntity);
 		
@@ -114,8 +110,8 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 				writer.writeRow(headers);
 			}
 
-			writeResults(results, writer);
-			
+			writer.writeDataTable(results, getContext());
+
 			if (results.getRowCount() != PAGE_SIZE) {
 				break;
 			}
@@ -161,34 +157,5 @@ public class ExportOQLToCSV extends CustomJavaAction<IMendixObject>
 		request.setParameters(parameterMap);
 		return request;
 	}
-	
-	private void writeResults(IDataTable results, MxCSVWriter writer) throws IOException {
-		for (IDataRow row : results.getRows()) {
-			List<String> values = IntStream
-					.range(0, results.getSchema().getColumnCount())
-					.mapToObj(index -> row.getValue(getContext(), index))
-					.map(value -> {
-						if (value == null) return "";
-						else {
-							if (value instanceof Date) {
-								return Long.toString(((Date) value).getTime()); // use timestamp to export for more precision than just seconds.
-							} else if (value instanceof IMendixIdentifier) {
-								return Long.toString(((IMendixIdentifier) value).toLong());
-							} else {
-								return value.toString();
-							}
-						}
-					})
-					.map(value ->
-							this.removeNewLinesFromValues
-									? value.replaceAll("\r", " ").replaceAll("\n", "")
-									: value
-					)
-					.collect(Collectors.toCollection(ArrayList::new));
-			writer.writeRow(values);
-		}
-	}
-
-	
 	// END EXTRA CODE
 }
