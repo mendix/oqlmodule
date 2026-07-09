@@ -32,15 +32,15 @@ import java.util.stream.Collectors;
  */
 public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 {
-	private final java.lang.String statement;
+	private final java.lang.String query;
 
 	public ExportOQLToMarkdown(
 		IContext context,
-		java.lang.String _statement
+		java.lang.String _query
 	)
 	{
 		super(context);
-		this.statement = _statement;
+		this.query = _query;
 	}
 
 	@java.lang.Override
@@ -56,7 +56,7 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 			while (true) {
 
 				IContext context = getContext().createSudoClone();
-				IDataTable results = Core.retrieveOQLDataTable(context, buildRequest(statement, offset, PAGE_SIZE));
+				IDataTable results = Core.retrieveOQLDataTable(context, buildRequest(query, offset, PAGE_SIZE));
 
 				if (offset == 0) {
 					List<String> headers = results.getSchema()

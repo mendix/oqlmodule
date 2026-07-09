@@ -37,13 +37,7 @@ import oql.implementation.MxCSVWriter;
 import oql.implementation.OQL;
 import system.proxies.FileDocument;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.mendix.systemwideinterfaces.core.UserAction;
 
 /**
  * Java action that executes an OQL query and saves the result in a CSV file stored in an object of the specified FileDocument entity, which is then returned
