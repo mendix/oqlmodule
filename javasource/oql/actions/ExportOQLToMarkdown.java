@@ -76,7 +76,7 @@ public class ExportOQLToMarkdown extends UserAction<java.lang.String>
 				offset += PAGE_SIZE;
 			}
 			OQL.resetParameters();
-		
+
 			return stringWriter.toString();
 		}
 		// END USER CODE
