@@ -24,9 +24,10 @@ public class MxCSVWriterTest {
     output = new StringOutputStream();
     
     defaultWriter = new MxCSVWriter(new OutputStreamWriter(output),
-        ',',
-        Optional.of('"'),
-        Optional.of('\\'));
+      ',',
+      Optional.of('"'),
+      Optional.of('\\'),
+      true);
   }
   
   String writeAndGetResult(MxCSVWriter writer, List<List<String>> columns) throws IOException {
@@ -65,12 +66,13 @@ public class MxCSVWriterTest {
   @Test
   public void testEscapedSpecialCharacters() throws IOException {
     MxCSVWriter writerWithoutQuote = new MxCSVWriter(new OutputStreamWriter(output),
-        ',',
-        Optional.empty(),
-        Optional.of('\\'));
-    
-    List<List<String>> toWrite = List.of(List.of(",","\r\n"),
-        List.of("\\", "\""));
+      ',',
+      Optional.empty(),
+      Optional.of('\\'),
+      true);
+
+    List<List<String>> toWrite = List.of(List.of(",", "\r\n"),
+      List.of("\\", "\""));
     assertEquals(
         "\\,,\r\\\n\r\n"
             + "\\\\,\"\r\n",

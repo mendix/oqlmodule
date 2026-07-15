@@ -1,1 +1,4 @@
-We upgraded the module to Mendix version 9.24.36
+- We upgraded the module to Mendix version 9.24.36
+- We removed the CsvAsTable widget and replaced it with the Markdown viewer, which is a platform supported widget and can be downloaded from the marketplace.
+- We added an ExportOQLToMarkdown java action that generates a Markdown formatted table from the result of executing an OQL query.
+- We removed the dependency on the Community Commons module.
