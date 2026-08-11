@@ -6,7 +6,9 @@ plugins {
 
 apply from: 'environment.gradle'
 
-sourceCompatibility = '21'
+java {
+    sourceCompatibility = '21'
+}
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
@@ -45,6 +47,7 @@ dependencies {
         [group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2']
     )
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.8.2')
+    testRuntimeOnly('org.junit.platform:junit-platform-launcher')
 }
 
 sourceSets {
