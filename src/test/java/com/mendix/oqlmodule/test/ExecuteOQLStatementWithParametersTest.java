@@ -5,12 +5,16 @@ import oql.actions.*;
 import oql.proxies.ExamplePerson;
 import oql.proxies.ExamplePersonResult;
 import oql.proxies.Gender;
+import oqlexample.proxies.ExampleAssocTarget;
+import oqlexample.proxies.ExampleResultNPE;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ExecuteOQLStatementWithParametersTest extends OQLStatementTestSkeleton {
 
@@ -139,4 +143,29 @@ public class ExecuteOQLStatementWithParametersTest extends OQLStatementTestSkele
 
     assertExamplePersonEquals(this.testPersons, oqlResult, someMembers);
   }
+
+  @Test
+  public void executeOQLStatementWithInheritedSingleAssociationParameter() throws Exception {
+    ExampleAssocTarget target = createTarget("target");
+    createExampleDataSpecialization(target, null);
+    final String selectInheritedWithArgument = selectInheritedSingle + " WHERE OQLExample.ExampleData_ExampleAssocTarget = $Param";
+    new AddObjectParameter(this.context, "Param", target.getMendixObject()).executeAction();
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(selectInheritedWithArgument);
+
+    assertEquals(1, oqlResult.size());
+    assertEquals(target.getMendixObject().getId(), ExampleResultNPE.initialize(this.context, oqlResult.get(0)).getExampleResultNPE_ExampleAssocTarget().getMendixObject().getId());
+  }
+
+  @Test
+  public void executeOQLStatementWithInheritedSingleAssociationNullParameter() throws Exception {
+    createExampleDataSpecialization(null, null);
+    final String selectInheritedWithArgument = selectInheritedSingle + " WHERE OQLExample.ExampleData_ExampleAssocTarget = $Param";
+    new AddObjectParameter(this.context, "Param", null).executeAction();
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(selectInheritedWithArgument);
+
+    assertEquals(0, oqlResult.size());
+  }
 }
+
