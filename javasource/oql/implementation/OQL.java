@@ -124,7 +124,8 @@ public class OQL {
 						logger.trace("Treating column " + columnSchema.getName() + " as an association");
 						IMetaAssociation association = getAssociation(targetObj, columnSchema);
 						if (association != null) {
-							targetObj.setValue(context, association.getName(), value);
+							boolean singletonList = association.getType() == IMetaAssociation.AssociationType.REFERENCESET;
+							targetObj.setValue(context, association.getName(), singletonList ? Collections.singletonList((IMendixIdentifier) value) : value);
 						} else {
 							throw new RuntimeException("Could not find result association " + columnSchema.getName() + " in target object.");
 						}
