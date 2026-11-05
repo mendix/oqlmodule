@@ -193,7 +193,7 @@ public class OQL {
 
 		return targetObj
 			.getMetaObject()
-			.getDeclaredMetaAssociationsParent()
+			.getMetaAssociationsParent()
 			.stream()
 			.filter(association -> association.getName().matches(columnSchemaPattern))
 			.findFirst()
