@@ -1,0 +1,2 @@
+- We fixed an issue where you could not retrieve associations of generalizations.
+- We fixed an issue where you could not retrieve to-many associations. If you select an association of one to many or many to many, one result will be generated per associated object.
