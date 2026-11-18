@@ -6,11 +6,13 @@ import com.mendix.systemwideinterfaces.core.IMendixObject;
 import oql.actions.ExecuteOQLStatement;
 import oql.proxies.ExamplePersonResult;
 import oql.proxies.ExamplePersonResult.MemberNames;
+import oqlexample.proxies.ExampleAssocTarget;
 import oqlexample.proxies.ExampleData;
 import oqlexample.proxies.ExampleDataSpecialization;
 import oqlexample.proxies.ExampleResultNPE;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -102,6 +104,68 @@ public class ExecuteOQLStatementTest extends OQLStatementTestSkeleton {
 
     // Perform test
     executeOQLStatementWithExampleData(exampleData.getMendixObject(), "SELECT * FROM OQLExample.ExampleDataSpecialization");
+  }
+
+  @Test
+  public void executeOQLStatementWithInheritedSingleAssociationSet() throws Exception {
+    ExampleAssocTarget target = createTarget("target");
+    createExampleDataSpecialization(target, null);
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(selectInheritedSingle);
+
+    assertEquals(1, oqlResult.size());
+    ExampleResultNPE result = ExampleResultNPE.initialize(this.context, oqlResult.get(0));
+    assertEquals(target.getMendixObject().getId(), result.getExampleResultNPE_ExampleAssocTarget().getMendixObject().getId());
+  }
+
+  @Test
+  public void executeOQLStatementWithInheritedSingleAssociationNull() throws Exception {
+    createExampleDataSpecialization(null, null);
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(selectInheritedSingle);
+
+    assertEquals(1, oqlResult.size());
+    assertNull(ExampleResultNPE.initialize(this.context, oqlResult.get(0)).getExampleResultNPE_ExampleAssocTarget());
+  }
+
+  @Test
+  public void executeOQLStatementWithInheritedManyAssociationSet() throws Exception {
+    ExampleAssocTarget target1 = createTarget("target1");
+    ExampleAssocTarget target2 = createTarget("target2");
+    createExampleDataSpecialization(null, Arrays.asList(target1, target2));
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(selectInheritedMany);
+
+    assertEquals(2, oqlResult.size());
+    List<ExampleAssocTarget> targets = new ArrayList<>();
+    for (IMendixObject object : oqlResult) {
+      targets.addAll(ExampleResultNPE.initialize(this.context, object).getExampleResultNPE_ExampleAssocTarget_Many());
+    }
+    assertEquals(2, targets.size());
+  }
+
+  @Test
+  public void executeOQLStatementWithInheritedManyAssociationEmpty() throws Exception {
+    createExampleDataSpecialization(null, null);
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(selectInheritedMany);
+
+    assertEquals(1, oqlResult.size());
+    assertTrue(ExampleResultNPE.initialize(this.context, oqlResult.get(0)).getExampleResultNPE_ExampleAssocTarget_Many().isEmpty());
+  }
+
+  @Test
+  public void executeOQLStatementJoinThroughInheritedAssociation() throws Exception {
+    ExampleAssocTarget target = createTarget("target");
+    createExampleDataSpecialization(target, null);
+
+    List<IMendixObject> oqlResult = executeInheritedQuery(
+      "SELECT AssocTarget.id ExampleResultNPE_ExampleAssocTarget " +
+      "FROM OQLExample.ExampleDataSpecialization Data " +
+      "JOIN Data/OQLExample.ExampleData_ExampleAssocTarget/OQLExample.ExampleAssocTarget AssocTarget");
+
+    assertEquals(1, oqlResult.size());
+    assertEquals(target.getMendixObject().getId(), ExampleResultNPE.initialize(this.context, oqlResult.get(0)).getExampleResultNPE_ExampleAssocTarget().getMendixObject().getId());
   }
 
   private void executeOQLStatementWithExampleData(IMendixObject expectedData, String query) throws Exception {
