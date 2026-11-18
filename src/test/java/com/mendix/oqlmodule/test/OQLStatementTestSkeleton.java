@@ -5,11 +5,15 @@ import com.mendix.core.CoreException;
 import com.mendix.logging.ILogNode;
 import com.mendix.systemwideinterfaces.core.*;
 import com.mendix.test.run.ProjectRunner;
+import oql.actions.ExecuteOQLStatement;
 import oql.implementation.OQL;
 import oql.proxies.ExamplePerson;
 import oql.proxies.ExamplePersonResult;
 import oql.proxies.ExamplePersonResult.MemberNames;
 import oql.proxies.Gender;
+import oqlexample.proxies.ExampleAssocTarget;
+import oqlexample.proxies.ExampleDataSpecialization;
+import oqlexample.proxies.ExampleResultNPE;
 import org.junit.jupiter.api.*;
 import system.proxies.User;
 
@@ -29,6 +33,10 @@ abstract public class OQLStatementTestSkeleton {
   protected static final String selectAll =
     "SELECT id ExamplePersonResult_ExamplePerson, Number, Name, DateOfBirth, Age, LongAge, Active, HeightInDecimal, Gender, OQL.MarriedTo Result_MarriedTo FROM OQL.ExamplePerson";
   protected static final String selectSome = "SELECT id ExamplePersonResult_ExamplePerson, Name, Age FROM OQL.ExamplePerson";
+  protected static final String selectInheritedSingle =
+    "SELECT Contents, OQLExample.ExampleData_ExampleAssocTarget ExampleResultNPE_ExampleAssocTarget FROM OQLExample.ExampleDataSpecialization";
+  protected static final String selectInheritedMany =
+    "SELECT Contents, OQLExample.ExampleData_ExampleAssocTarget_Many ExampleResultNPE_ExampleAssocTarget_Many FROM OQLExample.ExampleDataSpecialization";
   protected static final MemberNames[] someMembers = new MemberNames[]{MemberNames.ExamplePersonResult_ExamplePerson, MemberNames.Name, MemberNames.Age};
   protected static final int TEST_OBJECTS = 5;
 
@@ -136,4 +144,31 @@ abstract public class OQLStatementTestSkeleton {
     IMendixIdentifier resultId = result != null ? result.getMendixObject().getId() : null;
     assertEquals(expectedId, resultId);
   }
+
+  protected ExampleAssocTarget createTarget(String name) throws CoreException {
+    ExampleAssocTarget target = new ExampleAssocTarget(this.context);
+    target.setName(name);
+    target.commit();
+
+    return target;
+  }
+
+  protected ExampleDataSpecialization createExampleDataSpecialization(ExampleAssocTarget single, List<ExampleAssocTarget> many) throws CoreException {
+    ExampleDataSpecialization exampleData = new ExampleDataSpecialization(this.context);
+    exampleData.setContents("abc");
+    if (single != null) {
+      exampleData.setExampleData_ExampleAssocTarget(single);
+    }
+    if (many != null) {
+      exampleData.setExampleData_ExampleAssocTarget_Many(many);
+    }
+    exampleData.commit();
+
+    return exampleData;
+  }
+
+  protected List<IMendixObject> executeInheritedQuery(String query) throws Exception {
+    return new ExecuteOQLStatement(this.context, query, ExampleResultNPE.entityName, null, null, false).executeAction();
+  }
 }
+
